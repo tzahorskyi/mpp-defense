@@ -197,7 +197,7 @@
                 </label>
                 <button class="btn" onclick="changeFont(-2)">A-</button>
                 <button class="btn" onclick="changeFont(2)">A+</button>
-                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 04:00</button>
+                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 05:00</button>
                 <button class="btn" onclick="resetAll()">Скинути</button>
             </div>
         </div>
@@ -221,6 +221,8 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line" onclick="markActive(this)">Маршрут <code>/api/tasks</code> передає параметри фільтра в сервіс. Запит за номером повертає завдання або 404.</p>
 
+        <p class="line" onclick="markActive(this)">Ідентифікатор у шляху потрібен, коли я звертаюся до конкретного запису. Фільтри передаю в рядку запиту, бо вони визначають, яку частину списку повернути. Обидва маршрути звертаються до одного сервісу.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>Створення завдання.</strong> <code>lab2/Program.cs:46</code> (рядки 46–49).</p>
 
         <pre class="source-code">tasks.MapPost(&quot;/&quot;, async Task&lt;Results&lt;Created&lt;TaskDto&gt;, ValidationProblem&gt;&gt; (TaskRequest r, TaskService s) =&gt;
@@ -230,13 +232,19 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line" onclick="markActive(this)">Після збереження API повертає 201 і адресу нового завдання. Якщо проєкт не існує, повертає помилку валідації.</p>
 
+        <p class="line" onclick="markActive(this)">У запиті на створення клієнт передає назву, пріоритет і проєкт. Відповідь містить ідентифікатор, який згенерувала база. Існування проєкту перевіряю перед збереженням, щоб кожне завдання було прив’язане до реального проєкту.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → читання.</strong> Покажи JSON зі списком проєктів і завдань.</p>
 
         <p class="line" onclick="markActive(this)">Через GET отримую JSON зі списком проєктів і завдань. Для кожного проєкту сервер одразу повертає загальну кількість завдань і кількість виконаних. Клієнту не потрібно рахувати це самому.</p>
 
+        <p class="line" onclick="markActive(this)">У виводі для завдання видно назву, пріоритет, стан і назву проєкту. Цих полів досить, щоб клієнт показав готовий список, навіть якщо користувач ще не відкривав окремого проєкту.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → фільтр і пошук.</strong> Покажи сортування за пріоритетом і результат пошуку <code>лр</code>.</p>
 
         <p class="line" onclick="markActive(this)">Фільтр залишив невиконані завдання з пріоритетом від двох. Найвищий пріоритет іде першим, бо в запиті задано <code>sort=-priority</code>. Пошук «лр» знаходить і назви з великими «ЛР».</p>
+
+        <p class="line" onclick="markActive(this)">У першому запиті умови діють разом. Виконані завдання пропускаються, навіть якщо в них високий пріоритет. У другому запиті пошук іде за назвою або описом. Для кирилиці порівнюю текст без урахування регістру.</p>
 
         <h2>Показ результату</h2>
 
@@ -244,9 +252,13 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line" onclick="markActive(this)">Створив завдання «Пробіжка 5 км». Сервер повернув 201 і адресу нового запису в заголовку <code>Location</code>. Після PUT повторний GET показав пріоритет 3 і статус «виконано». Видалення дало 204, а наступний GET — 404, бо запису вже немає.</p>
 
+        <p class="line" onclick="markActive(this)">Зверну увагу на 204 після зміни й видалення. Це успішна відповідь без тіла, тому новий стан перевіряю окремим GET. У першому випадку бачимо змінений запис, у другому отримуємо 404.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перевірка помилок.</strong> Покажи поле <code>errors</code> у відповіді. Якщо цього достатньо, на наступній паузі заверши показ через <code>Ctrl+C</code>.</p>
 
         <p class="line" onclick="markActive(this)">Для некоректних даних сервер повертає 400. У полі <code>errors</code> видно, що саме треба виправити, наприклад завеликий пріоритет або закоротку назву.</p>
+
+        <p class="line" onclick="markActive(this)">У першому прикладі «x» має менше трьох символів, а пріоритет 7 виходить за межі від 1 до 3. Окремо перевіряю посилання на неіснуючий проєкт. В обох випадках сервер відхиляє запит до того, як створити запис.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
@@ -317,7 +329,7 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
         function renderTimer() {
             const m = String(Math.floor(seconds / 60)).padStart(2, "0");
             const s = String(seconds % 60).padStart(2, "0");
-            timerEl.textContent = `⏱ ${m}:${s} / 04:00`;
+            timerEl.textContent = `⏱ ${m}:${s} / 05:00`;
         }
         function toggleTimer() {
             if (timerInterval) {

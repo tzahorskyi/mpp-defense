@@ -197,7 +197,7 @@
                 </label>
                 <button class="btn" onclick="changeFont(-2)">A-</button>
                 <button class="btn" onclick="changeFont(2)">A+</button>
-                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 05:00</button>
+                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 06:00</button>
                 <button class="btn" onclick="resetAll()">Скинути</button>
             </div>
         </div>
@@ -221,6 +221,8 @@ builder.Services.AddSingleton&lt;ApiClient&gt;();</pre>
 
         <p class="line" onclick="markActive(this)">Указую адресу API з ЛР 3. Для Android <code>10.0.2.2</code> веде з емулятора до сервера на комп’ютері.</p>
 
+        <p class="line" onclick="markActive(this)">Той самий клієнт використовує <code>localhost</code> у Windows і спеціальну адресу хоста в Android-емуляторі. Адресу налаштовую в одному місці. Екрани входу й завдань працюють через спільний <code>ApiClient</code>.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>Оновлення списку.</strong> <code>lab4/ViewModels.cs:75</code> (рядки 75–78).</p>
 
         <pre class="source-code">bool? done = Filter switch { 1 =&gt; false, 2 =&gt; true, _ =&gt; null };
@@ -230,13 +232,19 @@ foreach (var t in items) Tasks.Add(t);</pre>
 
         <p class="line" onclick="markActive(this)">Передаю пошук, фільтр і сортування в API. Коли приходить відповідь, замінюю список на екрані. Це видно, коли вводжу «лр».</p>
 
+        <p class="line" onclick="markActive(this)">Екран прив’язаний до списку у ViewModel. Після відповіді сервера колекція оновлюється, а список перемальовується. Кнопки й поля керують запитом, а отримані дані відображаються на екрані.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → відкривається застосунок.</strong> Спочатку спробуй неправильний пароль, потім увійди з даними з термінала.</p>
 
         <p class="line" onclick="markActive(this)">З неправильним паролем API повертає 401, а застосунок показує помилку під формою. Після успішного входу застосунок отримує токен і використовує його, щоб завантажити список завдань.</p>
 
+        <p class="line" onclick="markActive(this)">Після входу зверху видно ім’я користувача. Нижче — його завдання, терміни й пріоритети. Цей список завантажився з API, тому його вміст залежить від облікового запису, під яким я увійшов.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>2. В емуляторі → список і пошук.</strong> Введи <code>лр</code> і натисни кнопку пошуку на клавіатурі емулятора. Покажи фільтр чи сортування, потім очисть пошук.</p>
 
         <p class="line" onclick="markActive(this)">Пошук звузив список до завдань, де «лр» є в назві або описі. Коли змінюю фільтр чи сортування, застосунок робить новий запит до API і оновлює список.</p>
+
+        <p class="line" onclick="markActive(this)">Можу перемкнутися з «Невиконані» на «Усі». Тоді з’являються й виконані завдання. Сортування за пріоритетом змінює порядок карток. Так на одному екрані перевіряю, що всі параметри запиту працюють у клієнті.</p>
 
         <h2>Показ результату</h2>
 
@@ -244,9 +252,13 @@ foreach (var t in items) Tasks.Add(t);</pre>
 
         <p class="line" onclick="markActive(this)">Нове завдання з’явилося у списку після збереження на сервері. У деталях після редагування видно статус «Виконано». Якщо підтвердити видалення, завдання зникає зі списку.</p>
 
+        <p class="line" onclick="markActive(this)">На формі також можна перевірити помилку. З назвою «x» сервер повідомляє, що назва закоротка, і форма лишається відкритою. Після виправлення й збереження повертаюся до списку та відкриваю створене завдання.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter у терміналі → сервер вимкнено.</strong> Потягни список униз в емуляторі. Після показу натисни Enter у терміналі для завершення.</p>
 
         <p class="line" onclick="markActive(this)">Після зупинки API я тягну список униз. Застосунок пробує повторно завантажити дані й показує «Сервер недоступний». Так користувач бачить, чому оновлення не відбулося.</p>
+
+        <p class="line" onclick="markActive(this)">Під час цього показу сам застосунок продовжує працювати. Зникає можливість отримати свіжі дані від API, і застосунок виводить конкретну причину. Цей випадок відрізняється від помилки входу, коли сервер доступний і відповідає на запит.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
@@ -317,7 +329,7 @@ foreach (var t in items) Tasks.Add(t);</pre>
         function renderTimer() {
             const m = String(Math.floor(seconds / 60)).padStart(2, "0");
             const s = String(seconds % 60).padStart(2, "0");
-            timerEl.textContent = `⏱ ${m}:${s} / 05:00`;
+            timerEl.textContent = `⏱ ${m}:${s} / 06:00`;
         }
         function toggleTimer() {
             if (timerInterval) {

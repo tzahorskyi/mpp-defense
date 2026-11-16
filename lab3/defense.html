@@ -197,7 +197,7 @@
                 </label>
                 <button class="btn" onclick="changeFont(-2)">A-</button>
                 <button class="btn" onclick="changeFont(2)">A+</button>
-                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 04:00</button>
+                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 06:00</button>
                 <button class="btn" onclick="resetAll()">Скинути</button>
             </div>
         </div>
@@ -222,6 +222,8 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">Після успішного входу сервер видає токен. Захищений маршрут <code>/me</code> читає з нього ім’я та роль.</p>
 
+        <p class="line" onclick="markActive(this)">Тут дві різні перевірки. Спочатку сервер підтверджує особу за логіном і паролем. Коли клієнт уже передає токен, сервер перевіряє його, а далі вирішує, чи дозволено цій людині читати або змінювати конкретні дані.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>Перевірка прав на ресурс.</strong> <code>lab3/Program.cs:231</code> (рядки 231–235).</p>
 
         <pre class="source-code">protected override Task HandleRequirementAsync(AuthorizationHandlerContext ctx, OwnerRequirement req, int ownerId)
@@ -232,13 +234,19 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">Перевірку проходить власник запису або адміністратор. Тому той самий запит до чужого завдання дає звичайному користувачу 403, а адміністратору повертає дані.</p>
 
+        <p class="line" onclick="markActive(this)">У перевірці беру ідентифікатор користувача з токена й порівнюю його з ідентифікатором власника в базі. Так рішення залежить від того, хто увійшов і кому належить запис. Роль Admin має окремий дозвіл.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → реєстрація і неправильний вхід.</strong> Покажи роль <code>User</code> у результаті реєстрації та помилки.</p>
 
         <p class="line" onclick="markActive(this)">Новий користувач отримав роль User, хоча передав Admin у запиті. Роль при реєстрації визначає сервер. Некоректні дані дають 400, а неправильний пароль під час входу — 401.</p>
 
+        <p class="line" onclick="markActive(this)">У терміналі видно три різні випадки. Коректна реєстрація створює користувача. Некоректний формат даних зупиняється на валідації. А запит на вхід із правильним форматом, але хибним паролем сервер відхиляє вже під час перевірки облікових даних.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → успішний вхід.</strong> Покажи відповідь <code>/api/auth/me</code> з іменем і роллю.</p>
 
         <p class="line" onclick="markActive(this)">Після успішного входу отримую підписаний JWT з ідентифікатором, роллю і терміном дії. Далі передаю його з кожним захищеним запитом у заголовку <code>Authorization</code>. У відповіді <code>/me</code> видно, якого користувача сервер розпізнав.</p>
+
+        <p class="line" onclick="markActive(this)">У розшифрованій частині токена видно поля <code>sub</code>, <code>name</code>, <code>role</code> й <code>exp</code>. <code>sub</code> — це ідентифікатор користувача, <code>exp</code> — час завершення дії. Сервер перевіряє підпис і термін дії перед тим, як використовувати ці дані.</p>
 
         <h2>Показ результату</h2>
 
@@ -246,9 +254,13 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">Без токена сервер повертає 401, бо не може підтвердити особу. Якщо звичайний користувач із чинним токеном запитує чуже завдання, отримує 403, бо не має права на цей запис. Адміністратор робить той самий запит і отримує завдання.</p>
 
+        <p class="line" onclick="markActive(this)">У звичайного користувача загальний список містить тільки власні завдання. Якщо власних завдань ще немає, список порожній. Якщо цей користувач звертається безпосередньо до існуючого чужого завдання, бачимо 403. Так перевіряю і фільтрацію списку, і доступ до окремого запису.</p>
+
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → додаткові перевірки.</strong> Покажи перенаправлення на HTTPS і стовпець із хешами в БД.</p>
 
         <p class="line" onclick="markActive(this)">Код 307 і заголовок <code>Location</code> показують, куди сервер перенаправив запит з HTTP. У таблиці користувачів видно хеші паролів. Ключ, яким сервер підписує токени, зберігається в User Secrets.</p>
+
+        <p class="line" onclick="markActive(this)">Окремий запит перевіряє CORS. Сервер дозволяє браузерному клієнту звертатися з <code>localhost:5173</code>, який указано в конфігурації. Ця перевірка стосується запитів між сайтами, а доступ до даних так само визначають токен і роль.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
@@ -319,7 +331,7 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
         function renderTimer() {
             const m = String(Math.floor(seconds / 60)).padStart(2, "0");
             const s = String(seconds % 60).padStart(2, "0");
-            timerEl.textContent = `⏱ ${m}:${s} / 04:00`;
+            timerEl.textContent = `⏱ ${m}:${s} / 06:00`;
         }
         function toggleTimer() {
             if (timerInterval) {
