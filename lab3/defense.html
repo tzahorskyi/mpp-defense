@@ -197,18 +197,20 @@
                 </label>
                 <button class="btn" onclick="changeFont(-2)">A-</button>
                 <button class="btn" onclick="changeFont(2)">A+</button>
-                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 06:00</button>
+                <button id="timer" class="timer btn" onclick="toggleTimer()" title="Старт або пауза таймера">⏱ 00:00 / 07:00</button>
                 <button class="btn" onclick="resetAll()">Скинути</button>
             </div>
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Дочекайся запуску API.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Запусти Docker Desktop і дочекайся запуску API.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 3</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У третій лабораторній додав вхід до API та перевірку прав користувача. Після входу сервер видає JWT, а далі перевіряє токен і доступ до ресурсу.</p>
+
+        <p class="line" onclick="markActive(this)">На початку в терміналі бачимо <code>ОС хоста: macOS</code> і версію ядра Darwin. Перші чотири кроки виконуються на цьому API, запущеному прямо на Mac.</p>
 
         <h2>Код для показу</h2>
 
@@ -261,6 +263,14 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
         <p class="line" onclick="markActive(this)">У відповіді на запит через HTTP бачимо <code>307</code> і заголовок <code>Location</code> з адресою, яка починається на <code>https://</code>. Сервер перенаправив запит на захищене з’єднання.</p>
 
         <p class="line" onclick="markActive(this)">Нижче <code>Access-Control-Allow-Origin</code> містить <code>localhost:5173</code>. Це адреса браузерного клієнта, якому дозволено звертатися до API. У таблиці користувачів стовпець <code>HashPrefix</code> виводить початок хешу пароля. Імена секретів виводяться окремо, а їхні значення замасковані.</p>
+
+        <h2>Запуск на двох ОС</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>5. Enter → запуск API в Linux</strong></p>
+
+        <p class="line" onclick="markActive(this)">Натискаю Enter. Тепер у рядку <code>ОС у контейнері</code> бачимо Linux. Docker запускає ту саму збірку ЛР 3, що працювала на Mac, з окремою тимчасовою базою. Нижче бачимо нову локальну HTTPS-адресу.</p>
+
+        <p class="line" onclick="markActive(this)">Запит до <code>/api/users</code> без токена повертає <code>401</code>. Після входу <code>/api/auth/me</code> повертає <code>200</code> та JSON з іменем і роллю <code>User</code>. Коли з цим токеном знову звертаємося до <code>/api/users</code>, бачимо <code>403</code>. Отже, в Linux теж працюють вхід і перевірка прав.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
@@ -331,7 +341,7 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
         function renderTimer() {
             const m = String(Math.floor(seconds / 60)).padStart(2, "0");
             const s = String(seconds % 60).padStart(2, "0");
-            timerEl.textContent = `⏱ ${m}:${s} / 06:00`;
+            timerEl.textContent = `⏱ ${m}:${s} / 07:00`;
         }
         function toggleTimer() {
             if (timerInterval) {
