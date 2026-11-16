@@ -203,10 +203,21 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Скрипт відкриє Ubuntu <code>Zahorskyi_Ubuntu</code> у VirtualBox. Якщо вона попросить увійти, відкрий свій сеанс. Дочекайся двох адрес API, потім повертайся до термінала на Mac. Кожен Enter виконує один і той самий крок на обох серверах.</p>
+        <h2>Підготовка перед захистом</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>1. На Mac.</strong> Заверши попередній запуск ЛР 3 або ЛР 4 у його терміналі. Ці демонстрації використовують порт 7080. Відкрий суфлер на телефоні, у VS Code відкрий папку <code>MPP</code> і файл <code>lab3/Program.cs</code>.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>2. Запуск.</strong> На Mac відкрий Terminal через Spotlight. Введи ці дві команди. Скрипт сам відкриє або відновить <code>Zahorskyi_Ubuntu</code> у VirtualBox і запустить обидва API.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 3</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>3. У вікні Ubuntu.</strong> Якщо бачиш екран входу Ubuntu, увійди у свій сеанс. Щоб показати роботу зсередини, натисни значок Terminal у лівій панелі Ubuntu й виконай команду нижче. Вивід має містити Linux та HTTP 200. За потреби натисни лівий ⌘, щоб VirtualBox відпустив клавіатуру.</p>
+
+        <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>uname -sr
+curl -ksS -o /dev/null -w &#x27;%{http_code}\n&#x27; https://localhost:7180/openapi/v1.json</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>4. Готовність до показу.</strong> У терміналі Mac дочекайся двох адрес, <code>https://localhost:7080</code> і <code>https://localhost:7180</code>, та паузи «КРОК: 1». Залиш вікно Ubuntu відкритим. Після вступу та короткого показу коду натискай Enter у терміналі Mac, по одному на кожен крок.</p>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У третій лабораторній додав вхід до API та перевірку прав користувача. Після входу сервер видає JWT, а далі перевіряє токен і доступ до ресурсу.</p>
 
@@ -242,13 +253,13 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">У перевірці беру ідентифікатор користувача з токена й порівнюю його з ідентифікатором власника в базі. Так рішення залежить від того, хто увійшов і кому належить запис. Роль Admin має окремий дозвіл.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → реєстрація та невдалий вхід</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>1. Реєстрація та невдалий вхід.</strong> Натисни Enter у терміналі Mac. У двох блоках знайди <code>HTTP 201</code>, поле <code>role</code>, потім <code>HTTP 400</code> і <code>HTTP 401</code>.</p>
 
         <p class="line" onclick="markActive(this)">У блоці <code>macOS</code> бачимо <code>HTTP 201</code> і <code>role: User</code> для нової користувачки <code>alice</code>. У запиті була роль Admin, але роль призначив сервер. Нижче в блоці <code>Linux</code> отримуємо ті самі 201 і User.</p>
 
         <p class="line" onclick="markActive(this)">Нижче йдуть дві помилки. Некоректний запит на реєстрацію повернув <code>status: 400</code> і список проблемних полів. Запит на вхід із неправильним паролем повернув <code>status: 401</code>, бо сервер не підтвердив облікові дані.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → успішний вхід</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>2. Вхід і JWT.</strong> Натисни Enter. Зупинись на <code>Поля JWT (claims)</code>, а потім на відповіді <code>GET /api/auth/me</code> з іменем і роллю.</p>
 
         <p class="line" onclick="markActive(this)">Після входу в обох блоках бачимо <code>HTTP 200</code>, термін дії <code>expiresAt</code> і роль. Скрипт отримує токен окремо від кожного сервера і передає його з наступним запитом у заголовку <code>Authorization</code>.</p>
 
@@ -256,13 +267,13 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <h2>Показ результату</h2>
 
-        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка прав доступу</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>3. Права доступу.</strong> Натисни Enter. У кожному блоці знайди запит без токена, <code>/api/tasks/1</code> від <code>alice</code> і той самий маршрут від <code>admin</code>. Порівняй коди 401, 403 і 200.</p>
 
         <p class="line" onclick="markActive(this)">У блоці macOS запит <code>GET /api/tasks без токена</code> повернув <code>401</code>. Далі з токеном <code>taras</code> бачимо його завдання, а з токеном <code>alice</code> — порожній список із відповіддю 200. Нижче той самий список перевірок повторився в блоці Linux.</p>
 
         <p class="line" onclick="markActive(this)">Нижче запит <code>alice</code> до <code>/api/tasks/1</code> дає <code>status: 403</code>. Сервер знає, хто звернувся, і перевірка показала, що завдання чуже. Коли той самий маршрут викликає адміністратор, у виводі з’являються номер і назва завдання.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → HTTPS, CORS і хеші паролів</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>4. HTTPS, CORS і хеші паролів.</strong> Натисни Enter. У кожному блоці зверни увагу на <code>Location</code>, <code>Access-Control-Allow-Origin</code> і таблицю зі стовпцем <code>HashPrefix</code>.</p>
 
         <p class="line" onclick="markActive(this)">У відповіді на запит через HTTP бачимо <code>307</code> і заголовок <code>Location</code> з адресою, яка починається на <code>https://</code>. Сервер перенаправив запит на захищене з’єднання.</p>
 
@@ -270,7 +281,11 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">Обидва API ще працюють. У виводі бачимо 401 без токена, 403 для чужого завдання і 200 для адміністратора в обох блоках. Після останнього Enter скрипт зупинить обидва API. Робочий стіл Ubuntu залишиться відкритим.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>5. Enter → зупинка обох серверів</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>Додаткове пояснення про JWT.</strong> Якщо викладач питає про прострочений токен, повернися до поля <code>exp</code> і коротко поясни перевірку терміну дії. Основні кроки цього запуску показують вхід і доступ з чинним токеном.</p>
+
+        <p class="line" onclick="markActive(this)">У JWT бачимо <code>exp</code>. Коли цей час минув, сервер відхиляє токен і повертає 401. Для 403 токен чинний, але роль або власник не проходять перевірку доступу.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>5. Завершення.</strong> Коли прокоментував результат і відповів на запитання, натисни останній Enter. Скрипт зупинить обидва API.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>

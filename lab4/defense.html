@@ -203,10 +203,22 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Скрипт запускає API з ЛР 3 та Android-емулятор. Перший запуск емулятора може тривати довше. Дані для входу з’являться в терміналі.</p>
+        <h2>Підготовка перед захистом</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>1. Windows, один раз заздалегідь.</strong> Відкрий VirtualBox на Mac, вибери <code>Zahorskyi_Win</code> і натисни «Запустити». Увійди у Windows. Відкрий Провідник, натисни адресний рядок, введи шлях нижче й натисни Enter. Проєкти вже лежать у спільній папці.</p>
+
+        <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>\\vboxsvr\Спільна_тека\MPP-Lab4</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>2. Збірка Windows.</strong> Скопіюй усю папку <code>MPP-Lab4</code> зі спільної теки на робочий стіл Windows. Відкрий копію та двічі клацни <code>Prepare Lab 4.cmd</code>. Для першої підготовки потрібен інтернет. Дочекайся <code>Ready</code>. Якщо бачиш помилку, збережи її перший рядок і виправ збірку перед захистом.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>3. Запуск Windows.</strong> У тій самій папці двічі клацни <code>Start Lab 4.cmd</code>. Він запускає локальний API ЛР 3 та Windows-версію клієнта. Дочекайся вікна «Завдання» і залиш відкритим термінал зі скриптом.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>4. Android на Mac.</strong> Заверши скрипт ЛР 3, якщо він ще чекає Enter. На Mac відкрий Terminal і виконай команди. Коли емулятор завантажиться і в терміналі буде «Встановлення та запуск застосунку», натисни Enter. Дочекайся форми входу.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 4</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>5. Вікна для показу.</strong> Залиш відкритими Windows у VirtualBox, Android-емулятор і термінал Mac. У VS Code відкрий <code>lab4/MauiProgram.cs</code> і <code>lab4/ViewModels.cs</code>. Логін в обох клієнтах — <code>taras</code>, пароль бери з відповідного вікна запуску.</p>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У четвертій лабораторній зробив клієнт для менеджера завдань. Сторінки показують дані, а <code>ApiClient</code> надсилає запити до сервера з третьої лабораторної.</p>
 
@@ -234,33 +246,35 @@ foreach (var t in items) Tasks.Add(t);</pre>
 
         <p class="line" onclick="markActive(this)">Екран прив’язаний до списку у ViewModel. Після відповіді сервера колекція оновлюється, а список перемальовується. Кнопки й поля керують запитом, а отримані дані відображаються на екрані.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>1. Enter у терміналі → запуск застосунку. Далі Android-емулятор</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>1. Вхід на Android і Windows.</strong> Перемкнися на Android. У полях «Логін» і «Пароль» введи тестові дані, натисни «Увійти». Спочатку покажи повідомлення з неправильним паролем, потім увійди правильно. У Windows натисни «Увійти» з правильними даними й відкрий список.</p>
 
         <p class="line" onclick="markActive(this)">На екрані входу вводжу навчальний логін із термінала. Спочатку пробую неправильний пароль і натискаю «Увійти». Під полями з’являється повідомлення про помилку, бо API повернув 401.</p>
 
         <p class="line" onclick="markActive(this)">Повторюю вхід із правильним паролем. Відкривається екран «Мої завдання». Над пошуком бачимо ім’я користувача, а у списку — його завдання. Клієнт отримав токен і використав його для запиту списку.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>2. Емулятор → пошук, фільтр і сортування</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>2. Пошук, фільтр і сортування.</strong> В Android натисни пошук, введи «лр», підтвердь з клавіатури. Далі вибери «Усі» й сортування за пріоритетом. Покажи той самий екран у Windows і зміни ширину вікна, щоб було видно адаптацію.</p>
 
         <p class="line" onclick="markActive(this)">У полі «Пошук за назвою або описом» вводжу «лр» і підтверджую пошук на клавіатурі. Список стає коротшим. У ньому залишаються завдання, у яких цей текст є в назві або описі.</p>
 
         <p class="line" onclick="markActive(this)">Під пошуком два поля. У фільтрі обираю «Усі». Тепер бачимо також виконані завдання. У сортуванні обираю порядок за пріоритетом, і картки міняються місцями. Після цього очищаю пошук і підтверджую його ще раз, щоб повернути повний список.</p>
 
+        <p class="line" onclick="markActive(this)">На Android бачимо екран застосунку в емуляторі, а у VirtualBox — його Windows-версію. Обидва клієнти завантажують дані через REST API. У кожного середовища свій локальний сервер і своя база, тому результати перевіряємо окремо.</p>
+
         <h2>Показ результату</h2>
 
-        <p class="line prep" onclick="markActive(this)"><strong>3. Емулятор → створення, редагування і видалення</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>3. Повний цикл із завданням.</strong> На Android натисни «＋ Завдання», заповни форму й вибери проєкт, якщо потрібно. Після спроби з короткою назвою створи «Демо Android». У Windows повтори з назвою «Демо Windows». На кожній платформі відкрий картку, зміни статус і видали запис.</p>
 
         <p class="line" onclick="markActive(this)">Натискаю «＋ Завдання». У полі «Назва» вводжу «x» і натискаю «Зберегти». Біля кнопки з’являється повідомлення, що назва закоротка. Форма залишається відкритою, тож одразу виправляю назву й зберігаю.</p>
 
         <p class="line" onclick="markActive(this)">У списку відкриваю нове завдання. Натискаю «Редагувати», вмикаю перемикач «Виконано» і зберігаю. У деталях тепер видно «Виконано ✓». Якщо натиснути «Видалити» й підтвердити, запис зникне зі списку після відповіді API.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>4. Enter у терміналі → зупинка API. Повернення в емулятор</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>4. Помилка з’єднання.</strong> Повернися в термінал Mac і натисни Enter на запрошенні «зупинити API». В Android потягни список униз для оновлення. Дочекайся повідомлення про недоступний сервер.</p>
 
         <p class="line" onclick="markActive(this)">У терміналі з’явилося «API зупинено». Повертаюся до списку завдань в емуляторі й тягну його вниз, щоб оновити. Над списком бачимо «Сервер недоступний».</p>
 
         <p class="line" onclick="markActive(this)">Додаток залишається відкритим. Повідомлення з’являється тому, що запит на оновлення більше не може зв’язатися з API.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>Enter у терміналі → завершення</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>Завершення показу.</strong> Натисни Enter у терміналі Mac. У Windows закрий клієнт і натисни Enter у вікні <code>Start Lab 4.cmd</code>, щоб зупинити API у віртуалці.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>

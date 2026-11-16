@@ -203,7 +203,26 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Запусти Docker Desktop. Збирання та підняття контейнерів може зайняти додатковий час.</p>
+        <h2>Підготовка перед захистом</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>1. На Mac.</strong> Через Spotlight відкрий Docker Desktop. У Terminal введи ці команди. <code>docker info</code> має вивести розділ <code>Server</code>, а список Buildx — активний збирач. У VS Code відкрий <code>lab5/Dockerfile</code>, <code>lab5/.dockerignore</code> та <code>lab5/compose.yaml</code>.</p>
+
+        <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
+docker info
+docker buildx ls</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>2. Збірка образу заздалегідь.</strong> Введи цей блок перед захистом. Він піднімає локальний реєстр, якщо потрібно, збирає образ для arm64 і amd64 та виводить його платформи. Дочекайся обох рядків <code>Platform</code>. Цей етап може тривати кілька хвилин.</p>
+
+        <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP/lab5
+if ! docker container inspect mpp-registry &gt;/dev/null 2&gt;&amp;1; then
+  docker run -d --name mpp-registry -p 5001:5000 registry:2
+else
+  docker start mpp-registry
+fi
+docker buildx build --platform linux/arm64,linux/amd64 -t localhost:5001/mpp-tasks-api:1.0 --push .
+docker buildx imagetools inspect localhost:5001/mpp-tasks-api:1.0</pre></div>
+
+        <p class="line prep" onclick="markActive(this)"><strong>3. Початок показу.</strong> У терміналі Mac введи команди нижче. Залиш вікно Docker Desktop відкритим, щоб за потреби перемкнутися на список контейнерів. Скрипт чекає Enter перед кожним кроком.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 5</pre></div>
@@ -240,13 +259,13 @@ COPY --from=build /app .</pre>
 
         <p class="line" onclick="markActive(this)">У налаштуваннях підключення до бази використовую ім’я сервісу <code>db</code>. Так контейнери знаходять один одного в мережі Compose. А порт 8080 потрібен для запитів до API з комп’ютера.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile і .dockerignore</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>1. Як зібрано образ.</strong> Натисни Enter. У виводі знайди два <code>FROM</code>, <code>dotnet publish</code> і рядок <code>COPY --from=build</code>. Нижче покажи <code>.env</code> у списку виключень.</p>
 
         <p class="line" onclick="markActive(this)">Термінал виводить <code>Dockerfile</code>. У першому <code>FROM</code> бачимо образ .NET SDK, а далі — <code>dotnet publish</code>, який збирає програму. Другий <code>FROM</code> використовує ASP.NET Runtime, і команда <code>COPY --from=build</code> переносить туди готову збірку.</p>
 
         <p class="line" onclick="markActive(this)">Під Dockerfile виводиться <code>.dockerignore</code>. Тут є <code>.env</code>, файли бази, <code>bin</code> та <code>obj</code>. Docker виключає їх із контексту збірки, тому в образ не потрапляють локальні налаштування і зайві файли.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → запуск Docker Compose</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>2. Підняття API й PostgreSQL.</strong> Натисни Enter і дочекайся таблиці <code>docker compose ps</code>. Шукай сервіс <code>db</code> зі станом <code>healthy</code> і сервіс <code>api</code> з портом 8080. За потреби розгорни проєкт у Docker Desktop → Containers.</p>
 
         <p class="line" onclick="markActive(this)">Після запуску в таблиці <code>docker compose ps</code> бачимо два сервіси, <code>db</code> і <code>api</code>. У рядку <code>db</code> є позначка <code>healthy</code>. Compose дочекався, поки PostgreSQL готовий приймати з’єднання, і запустив API.</p>
 
@@ -254,23 +273,27 @@ COPY --from=build /app .</pre>
 
         <h2>Показ результату</h2>
 
-        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка API та запису в базі</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>3. Перевірка й запис у базі.</strong> Натисни Enter. Знайди <code>Healthy</code> у відповіді, потім <code>id</code> нового «ЛР5 Docker» в JSON. Зістав його з <code>Id</code> у таблиці PostgreSQL.</p>
 
         <p class="line" onclick="markActive(this)">Під запитом до <code>/health</code> бачимо <code>Healthy</code>. Це означає, що API відповідає і перевірка з’єднання з PostgreSQL пройшла.</p>
 
         <p class="line" onclick="markActive(this)">Після POST у JSON бачимо номер і назву «ЛР5 Docker». Нижче у таблиці з PostgreSQL є рядок із тією самою назвою й номером у стовпці <code>Id</code>. Це підтверджує, що завдання з відповіді API справді записано в базу.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перезапуск контейнерів</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>4. Перезапуск і збереження даних.</strong> Натисни Enter. Після повторного запуску знайди в результаті пошуку той самий <code>id</code>, який був на кроці 3.</p>
 
         <p class="line" onclick="markActive(this)">У терміналі видно, що <code>docker compose down</code> видалив контейнери, а <code>up</code> створив їх знову. Після запуску API повертає результати пошуку за словом «docker».</p>
 
         <p class="line" onclick="markActive(this)">У цьому списку знову є «ЛР5 Docker» з тим самим ідентифікатором, що був до перезапуску. Контейнер PostgreSQL новий, а каталог із даними Compose підключив із попереднього тому. Тому завдання залишилося на місці.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>5. Enter → запуск образу на двох архітектурах</strong></p>
+        <p class="line prep" onclick="markActive(this)"><strong>5. Дві архітектури.</strong> Натисни Enter. У списку маніфестів знайди <code>linux/amd64</code> і <code>linux/arm64</code>. Нижче покажи окремі результати запуску <code>aarch64</code> та <code>x86_64</code>.</p>
 
         <p class="line" onclick="markActive(this)">У виводі перевірки образу під одним тегом є дві платформи, <code>linux/arm64</code> і <code>linux/amd64</code>. Нижче перший <code>uname -m</code> показує архітектуру комп’ютера.</p>
 
         <p class="line" onclick="markActive(this)">Після команди запуску з <code>--platform linux/arm64</code> бачимо <code>aarch64</code>. Після запуску з <code>--platform linux/amd64</code> — <code>x86_64</code>. Це вже результати з контейнерів. Тег той самий, а Docker запускає відповідний варіант образу.</p>
+
+        <p class="line" onclick="markActive(this)">Підсумок видно в трьох місцях. API відповів <code>Healthy</code>, запис зберігся після перезапуску, а під одним тегом бачимо два варіанти образу. Це підтверджує роботу контейнерів, персистентність даних і підтримку двох архітектур.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Наприкінці.</strong> Скрипт сам зупиняє контейнери цього Compose-проєкту. Том PostgreSQL залишається для наступного запуску.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
