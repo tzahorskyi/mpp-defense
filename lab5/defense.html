@@ -148,6 +148,11 @@
             margin: 0;
             color: #a7f3d0;
         }
+        .source-code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.7em;
+        }
         .copy-btn {
             position: absolute;
             top: 8px;
@@ -204,6 +209,32 @@
 ./demo.sh 5</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У п’ятій лабораторній упакував API у Docker. <code>Dockerfile</code> збирає образ, а <code>compose.yaml</code> запускає API і PostgreSQL разом.</p>
+
+        <h2>Код для показу</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Збірка і запуск образу.</strong> <code>lab5/Dockerfile:9</code> (рядки 9–14).</p>
+
+        <pre class="source-code">RUN dotnet publish -a $TARGETARCH -c Release -o /app --no-restore &amp;&amp; mkdir /data
+
+# ---------- Етап 2: лише runtime ASP.NET Core, без SDK і вихідного коду ----------
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app .</pre>
+
+        <p class="line" onclick="markActive(this)">Компілюю застосунок під архітектуру, задану в <code>TARGETARCH</code>. У фінальний образ копіюю готову збірку та запускаю її в ASP.NET Runtime.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Старт API після бази.</strong> <code>lab5/compose.yaml:15</code> (рядки 15–22).</p>
+
+        <pre class="source-code">api:
+  build: .
+  image: mpp-tasks-api:1.0
+  depends_on:
+    db:
+      condition: service_healthy          # API стартує, коли PostgreSQL готовий
+  ports:
+    - &quot;8080:8080&quot;</pre>
+
+        <p class="line" onclick="markActive(this)">Compose чекає, поки PostgreSQL пройде перевірку стану. Потім запускає API та відкриває порт 8080.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile.</strong> Покажи два етапи збірки в терміналі.</p>
 

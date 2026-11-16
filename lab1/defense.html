@@ -148,6 +148,11 @@
             margin: 0;
             color: #a7f3d0;
         }
+        .source-code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.7em;
+        }
         .copy-btn {
             position: absolute;
             top: 8px;
@@ -198,12 +203,36 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Запусти Docker Desktop. Якщо попросять показати код, відкрий <code>lab1/Program.cs</code>. Демонстрація відтворює навчальні бази з початковими даними.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Запусти Docker Desktop. Демонстрація відтворює навчальні бази з початковими даними.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 1</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. Перша лабораторна — консольний менеджер завдань. У коді є моделі проєкту, завдання й тега, а EF Core працює з базою через спільний контекст.</p>
+
+        <h2>Код для показу</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Вибір бази.</strong> <code>lab1/Program.cs:8</code> (рядки 8–15).</p>
+
+        <pre class="source-code">var provider = builder.Configuration[&quot;Provider&quot;] ?? &quot;Sqlite&quot;;
+var cs = builder.Configuration.GetConnectionString(provider);
+_ = provider switch
+{
+    &quot;Sqlite&quot; =&gt; builder.Services.AddDbContext&lt;AppDb, SqliteDb&gt;(o =&gt; o.UseSqlite(cs)),
+    &quot;Postgres&quot; =&gt; builder.Services.AddDbContext&lt;AppDb, PostgresDb&gt;(o =&gt; o.UseNpgsql(cs)),
+    _ =&gt; throw new InvalidOperationException($&quot;Невідома СУБД: {provider}&quot;)
+};</pre>
+
+        <p class="line" onclick="markActive(this)">Параметр <code>Provider</code> визначає, який драйвер підключити. В обох випадках решта програми працює зі спільним <code>AppDb</code>.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Запит зі списком завдань.</strong> <code>lab1/Program.cs:53</code> (рядки 53–56).</p>
+
+        <pre class="source-code">var important = db.Tasks
+    .Where(t =&gt; !t.Done &amp;&amp; t.Priority &gt;= 2)
+    .OrderByDescending(t =&gt; t.Priority).ThenBy(t =&gt; t.Due)
+    .Select(t =&gt; new { t.Title, t.Priority, t.Due, Project = t.Project.Name });</pre>
+
+        <p class="line" onclick="markActive(this)">Цей запит вибирає невиконані завдання з пріоритетом від двох і сортує їх. Саме його результат видно в рядках під <code>[Read]</code> після обох запусків.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → конфігурація.</strong> Покажи ключ <code>Provider</code> і два рядки підключення.</p>
 

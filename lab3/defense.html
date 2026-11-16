@@ -148,6 +148,11 @@
             margin: 0;
             color: #a7f3d0;
         }
+        .source-code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.7em;
+        }
         .copy-btn {
             position: absolute;
             top: 8px;
@@ -198,12 +203,34 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Дочекайся запуску API. Якщо попросять код, покажи в <code>lab3/Program.cs</code> налаштування JWT і політику <code>OwnerOrAdmin</code>.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Дочекайся запуску API.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 3</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У третій лабораторній додав вхід до API та перевірку прав користувача. Після входу сервер видає JWT, а далі перевіряє токен і доступ до ресурсу.</p>
+
+        <h2>Код для показу</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Вхід і поточний користувач.</strong> <code>lab3/Program.cs:83</code> (рядки 83–87).</p>
+
+        <pre class="source-code">auth.MapPost(&quot;/login&quot;, async (LoginRequest r, AuthService s) =&gt;
+    await s.LoginAsync(r) is { } token ? Results.Ok(token)
+        : Results.Problem(&quot;Невірний логін або пароль.&quot;, statusCode: StatusCodes.Status401Unauthorized));
+auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;                // дані про користувача беруться з claims токена
+    new MeDto(user.FindFirstValue(&quot;sub&quot;)!, user.Identity!.Name!, user.FindFirstValue(&quot;role&quot;)!));</pre>
+
+        <p class="line" onclick="markActive(this)">Після успішного входу сервер видає токен. Захищений маршрут <code>/me</code> читає з нього ім’я та роль.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Перевірка прав на ресурс.</strong> <code>lab3/Program.cs:231</code> (рядки 231–235).</p>
+
+        <pre class="source-code">protected override Task HandleRequirementAsync(AuthorizationHandlerContext ctx, OwnerRequirement req, int ownerId)
+{
+    if (ctx.User.IsInRole(&quot;Admin&quot;) || ctx.User.FindFirstValue(&quot;sub&quot;) == ownerId.ToString()) ctx.Succeed(req);
+    return Task.CompletedTask;
+}</pre>
+
+        <p class="line" onclick="markActive(this)">Перевірку проходить власник запису або адміністратор. Тому той самий запит до чужого завдання дає звичайному користувачу 403, а адміністратору повертає дані.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → реєстрація і неправильний вхід.</strong> Покажи роль <code>User</code> у результаті реєстрації та помилки.</p>
 

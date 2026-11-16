@@ -148,6 +148,11 @@
             margin: 0;
             color: #a7f3d0;
         }
+        .source-code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.7em;
+        }
         .copy-btn {
             position: absolute;
             top: 8px;
@@ -204,6 +209,26 @@
 ./demo.sh 4</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У четвертій лабораторній зробив клієнт для менеджера завдань. Сторінки показують дані, а <code>ApiClient</code> надсилає запити до сервера з третьої лабораторної.</p>
+
+        <h2>Код для показу</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Підключення до API.</strong> <code>lab4/MauiProgram.cs:11</code> (рядки 11–14).</p>
+
+        <pre class="source-code">var api = DeviceInfo.Platform == DevicePlatform.Android ? &quot;https://10.0.2.2:7080/&quot; : &quot;https://localhost:7080/&quot;;
+builder.Services.AddSingleton(new HttpClient(DevHandler())
+    { BaseAddress = new Uri(api), Timeout = TimeSpan.FromSeconds(15) });
+builder.Services.AddSingleton&lt;ApiClient&gt;();</pre>
+
+        <p class="line" onclick="markActive(this)">Указую адресу API з ЛР 3. Для Android <code>10.0.2.2</code> веде з емулятора до сервера на комп’ютері.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Оновлення списку.</strong> <code>lab4/ViewModels.cs:75</code> (рядки 75–78).</p>
+
+        <pre class="source-code">bool? done = Filter switch { 1 =&gt; false, 2 =&gt; true, _ =&gt; null };
+var items = await api.GetTasksAsync(Search, done, Sort switch { 1 =&gt; &quot;-priority&quot;, 2 =&gt; &quot;title&quot;, _ =&gt; &quot;due&quot; });
+Tasks.Clear();
+foreach (var t in items) Tasks.Add(t);</pre>
+
+        <p class="line" onclick="markActive(this)">Передаю пошук, фільтр і сортування в API. Коли приходить відповідь, замінюю список на екрані. Це видно, коли вводжу «лр».</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → відкривається застосунок.</strong> Спочатку спробуй неправильний пароль, потім увійди з даними з термінала.</p>
 

@@ -148,6 +148,11 @@
             margin: 0;
             color: #a7f3d0;
         }
+        .source-code {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.7em;
+        }
         .copy-btn {
             position: absolute;
             top: 8px;
@@ -198,12 +203,32 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Дочекайся напису, що API запущено. Якщо попросять код, у <code>lab2/Program.cs</code> покажи блок маршрутів завдань.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Дочекайся напису, що API запущено.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 2</pre></div>
 
         <p class="line" onclick="markActive(this)">Доброго дня. Я Тарас Загорський, група ІПЗ-31. У другій лабораторній я зробив REST API для менеджера завдань. Маршрути приймають запити, сервіс працює з базою, а DTO визначають поля запиту й відповіді.</p>
+
+        <h2>Код для показу</h2>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Читання завдань.</strong> <code>lab2/Program.cs:42</code> (рядки 42–45).</p>
+
+        <pre class="source-code">var tasks = app.MapGroup(&quot;/api/tasks&quot;).WithTags(&quot;Tasks&quot;);
+tasks.MapGet(&quot;/&quot;, ([AsParameters] TaskQuery q, TaskService s) =&gt; s.ListTasksAsync(q));
+tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, NotFound&gt;&gt; (int id, TaskService s) =&gt;
+    await s.GetTaskAsync(id) is { } t ? TypedResults.Ok(t) : TypedResults.NotFound());</pre>
+
+        <p class="line" onclick="markActive(this)">Маршрут <code>/api/tasks</code> передає параметри фільтра в сервіс. Запит за номером повертає завдання або 404.</p>
+
+        <p class="line prep" onclick="markActive(this)"><strong>Створення завдання.</strong> <code>lab2/Program.cs:46</code> (рядки 46–49).</p>
+
+        <pre class="source-code">tasks.MapPost(&quot;/&quot;, async Task&lt;Results&lt;Created&lt;TaskDto&gt;, ValidationProblem&gt;&gt; (TaskRequest r, TaskService s) =&gt;
+    await s.CreateTaskAsync(r) is { } t
+        ? TypedResults.Created($&quot;/api/tasks/{t.Id}&quot;, t)
+        : TypedResults.ValidationProblem(NoProject));</pre>
+
+        <p class="line" onclick="markActive(this)">Після збереження API повертає 201 і адресу нового завдання. Якщо проєкт не існує, повертає помилку валідації.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → читання.</strong> Покажи JSON зі списком проєктів і завдань.</p>
 
