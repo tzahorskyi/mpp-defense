@@ -244,7 +244,7 @@ COPY --from=build /app .</pre>
 
         <p class="line" onclick="markActive(this)">На першому етапі SDK збирає .NET-застосунок. У другий етап копіюю тільки готову збірку. Тому фінальний образ менший, а .NET SDK потрібен лише під час збірки.</p>
 
-        <p class="line" onclick="markActive(this)">Файл <code>.dockerignore</code> виключає <code>.env</code>, локальні файли бази й вихідні папки збірки з контексту Docker. Через це вони не потрапляють у збірку навіть на етапі, де Dockerfile копіює файли проєкту.</p>
+        <p class="line" onclick="markActive(this)">Файл <code>.dockerignore</code> виключає <code>.env</code>, локальні файли бази й папки <code>bin</code> та <code>obj</code> з контексту Docker. Через це вони не потрапляють у збірку навіть на етапі, де Dockerfile копіює файли проєкту.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → Docker Compose.</strong> Дочекайся статусів контейнерів.</p>
 

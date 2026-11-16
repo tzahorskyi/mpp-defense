@@ -246,7 +246,7 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">Після успішного входу отримую підписаний JWT з ідентифікатором, роллю і терміном дії. Далі передаю його з кожним захищеним запитом у заголовку <code>Authorization</code>. У відповіді <code>/me</code> видно, якого користувача сервер розпізнав.</p>
 
-        <p class="line" onclick="markActive(this)">У розшифрованій частині токена видно поля <code>sub</code>, <code>name</code>, <code>role</code> й <code>exp</code>. <code>sub</code> — це ідентифікатор користувача, <code>exp</code> — час завершення дії. Сервер перевіряє підпис і термін дії перед тим, як використовувати ці дані.</p>
+        <p class="line" onclick="markActive(this)">У декодованому вмісті токена видно поля <code>sub</code>, <code>name</code>, <code>role</code> й <code>exp</code>. <code>sub</code> — це ідентифікатор користувача, <code>exp</code> — час завершення дії. Сервер перевіряє підпис і термін дії перед тим, як використовувати ці дані.</p>
 
         <h2>Показ результату</h2>
 
