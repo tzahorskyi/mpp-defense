@@ -240,37 +240,37 @@ COPY --from=build /app .</pre>
 
         <p class="line" onclick="markActive(this)">У налаштуваннях підключення до бази використовую ім’я сервісу <code>db</code>. Так контейнери знаходять один одного в мережі Compose. А порт 8080 потрібен для запитів до API з комп’ютера.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile.</strong> Покажи два етапи збірки в терміналі.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile і .dockerignore</strong></p>
 
-        <p class="line" onclick="markActive(this)">На першому етапі SDK збирає .NET-застосунок. У другий етап копіюю тільки готову збірку. Тому фінальний образ менший, а .NET SDK потрібен лише під час збірки.</p>
+        <p class="line" onclick="markActive(this)">Термінал виводить <code>Dockerfile</code>. У першому <code>FROM</code> бачу образ .NET SDK, а далі — <code>dotnet publish</code>, який збирає програму. Другий <code>FROM</code> використовує ASP.NET Runtime, і команда <code>COPY --from=build</code> переносить туди готову збірку.</p>
 
-        <p class="line" onclick="markActive(this)">Файл <code>.dockerignore</code> виключає <code>.env</code>, локальні файли бази й папки <code>bin</code> та <code>obj</code> з контексту Docker. Через це вони не потрапляють у збірку навіть на етапі, де Dockerfile копіює файли проєкту.</p>
+        <p class="line" onclick="markActive(this)">Під Dockerfile виводиться <code>.dockerignore</code>. Тут є <code>.env</code>, файли бази, <code>bin</code> та <code>obj</code>. Docker виключає їх із контексту збірки, тому в образ не потрапляють локальні налаштування і зайві файли.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → Docker Compose.</strong> Дочекайся статусів контейнерів.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → запуск Docker Compose</strong></p>
 
-        <p class="line" onclick="markActive(this)">У списку видно два контейнери. Спочатку PostgreSQL має пройти перевірку стану. Лише після цього Compose запускає API, яке підключається до бази.</p>
+        <p class="line" onclick="markActive(this)">Після запуску в таблиці <code>docker compose ps</code> бачу два сервіси, <code>db</code> і <code>api</code>. У рядку <code>db</code> є позначка <code>healthy</code>. Compose дочекався, поки PostgreSQL готовий приймати з’єднання, і запустив API.</p>
 
-        <p class="line" onclick="markActive(this)">У терміналі дивлюся на стан <code>healthy</code> для PostgreSQL. Пароль і конфігурацію підключення API отримує через змінні оточення при запуску. Тому образ серверної програми можна використати з іншими значеннями конфігурації.</p>
+        <p class="line" onclick="markActive(this)">Під таблицею виводяться налаштування контейнера API. У рядку підключення <code>Host=db</code> видно, що програма звертається до бази за іменем сервісу в мережі Compose. Пароль у цьому виводі замаскований.</p>
 
         <h2>Показ результату</h2>
 
-        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка API.</strong> Покажи відповідь <code>/health</code> і завдання «ЛР5 Docker» у виводі PostgreSQL.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка API та запису в базі</strong></p>
 
-        <p class="line" onclick="markActive(this)">На <code>/health</code> отримав <code>Healthy</code>. Перевірка охоплює і з’єднання з базою. Через API створив завдання «ЛР5 Docker», а у виводі PostgreSQL видно відповідний рядок.</p>
+        <p class="line" onclick="markActive(this)">Під запитом до <code>/health</code> бачу <code>Healthy</code>. Це означає, що API відповідає і перевірка з’єднання з PostgreSQL пройшла.</p>
 
-        <p class="line" onclick="markActive(this)">Це дві різні перевірки. <code>Healthy</code> показує, що API зміг підключитися до бази. Збіг назви й ідентифікатора у відповіді API та в таблиці PostgreSQL підтверджує, що запит справді записав завдання.</p>
+        <p class="line" onclick="markActive(this)">Після POST у JSON бачу номер і назву «ЛР5 Docker». Нижче у таблиці з PostgreSQL є рядок із тією самою назвою й номером у стовпці <code>Id</code>. Це підтверджує, що завдання з відповіді API справді записано в базу.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перезапуск.</strong> Дочекайся повторного пошуку завдання.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перезапуск контейнерів</strong></p>
 
-        <p class="line" onclick="markActive(this)">Compose зупинив і видалив контейнери. Після повторного запуску пошук знову знаходить те саме завдання, бо дані PostgreSQL лежать у Docker volume, який Compose підключив до нового контейнера.</p>
+        <p class="line" onclick="markActive(this)">У терміналі видно, що <code>docker compose down</code> видалив контейнери, а <code>up</code> створив їх знову. Після запуску API повертає результати пошуку за словом «docker».</p>
 
-        <p class="line" onclick="markActive(this)">Порівнюю ідентифікатор завдання до й після перезапуску. Залишився той самий запис. У PostgreSQL каталог даних прив’язаний до іменованого тому, тому видалення контейнера не видаляє самі дані.</p>
+        <p class="line" onclick="markActive(this)">У цьому списку знову є «ЛР5 Docker» з тим самим ідентифікатором, що був до перезапуску. Контейнер PostgreSQL новий, а каталог із даними Compose підключив із попереднього тому. Тому завдання залишилося на місці.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>5. Enter → дві архітектури.</strong> Покажи <code>linux/arm64</code>, <code>linux/amd64</code> та результати <code>uname</code>.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>5. Enter → запуск образу на двох архітектурах</strong></p>
 
-        <p class="line" onclick="markActive(this)">Під одним тегом є образи для двох платформ. Запуск із параметром <code>--platform linux/arm64</code> показує <code>aarch64</code>, а <code>--platform linux/amd64</code> дає <code>x86_64</code>. Це видно у виводі <code>uname</code> всередині контейнера.</p>
+        <p class="line" onclick="markActive(this)">У виводі перевірки образу під одним тегом є дві платформи, <code>linux/arm64</code> і <code>linux/amd64</code>. Нижче перший <code>uname -m</code> показує архітектуру комп’ютера.</p>
 
-        <p class="line" onclick="markActive(this)">У виводі реєстру видно два варіанти під одним тегом. На Apple Silicon arm64 працює нативно, а amd64 запускається через емуляцію. Користувач може вказати ту саму назву образу, а Docker підбере варіант під платформу.</p>
+        <p class="line" onclick="markActive(this)">Після команди запуску з <code>--platform linux/arm64</code> бачу <code>aarch64</code>. Після запуску з <code>--platform linux/amd64</code> — <code>x86_64</code>. Це вже результати з контейнерів. Тег той самий, а Docker запускає відповідний варіант образу.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>

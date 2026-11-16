@@ -234,31 +234,31 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line" onclick="markActive(this)">У запиті на створення клієнт передає назву, пріоритет і проєкт. Відповідь містить ідентифікатор, який згенерувала база. Існування проєкту перевіряю перед збереженням, щоб кожне завдання було прив’язане до реального проєкту.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → читання.</strong> Покажи JSON зі списком проєктів і завдань.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>1. Enter → читання</strong></p>
 
-        <p class="line" onclick="markActive(this)">Через GET отримую JSON зі списком проєктів і завдань. Для кожного проєкту сервер одразу повертає загальну кількість завдань і кількість виконаних. Клієнту не потрібно рахувати це самому.</p>
+        <p class="line" onclick="markActive(this)">Після першого GET у терміналі з’явився список проєктів. У кожному об’єкті видно <code>taskCount</code> і <code>doneCount</code>. Сервер одразу рахує, скільки в проєкті завдань і скільки з них виконано.</p>
 
-        <p class="line" onclick="markActive(this)">У виводі для завдання видно назву, пріоритет, стан і назву проєкту. Цих полів досить, щоб клієнт показав готовий список, навіть якщо користувач ще не відкривав окремого проєкту.</p>
+        <p class="line" onclick="markActive(this)">Нижче йде відповідь на GET <code>/api/tasks</code>. У кожному рядку бачу назву, пріоритет, стан <code>done</code> і назву проєкту в полі <code>project</code>. З такої відповіді вже можна заповнити список у клієнті.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → фільтр і пошук.</strong> Покажи сортування за пріоритетом і результат пошуку <code>лр</code>.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>2. Enter → фільтр і пошук</strong></p>
 
-        <p class="line" onclick="markActive(this)">Фільтр залишив невиконані завдання з пріоритетом від двох. Найвищий пріоритет іде першим, бо в запиті задано <code>sort=-priority</code>. Пошук «лр» знаходить і назви з великими «ЛР».</p>
+        <p class="line" onclick="markActive(this)">У першій команді після <code>/api/tasks</code> стоять параметри <code>done=false</code>, <code>minPriority=2</code> і <code>sort=-priority</code>. Нижче у виводі пріоритет 3 іде перед 2. Так видно, що сервер застосував і фільтр, і сортування.</p>
 
-        <p class="line" onclick="markActive(this)">У першому запиті умови діють разом. Виконані завдання пропускаються, навіть якщо в них високий пріоритет. У другому запиті пошук іде за назвою або описом. Для кирилиці порівнюю текст без урахування регістру.</p>
+        <p class="line" onclick="markActive(this)">У наступному запиті шукаю «лр» малими літерами. У відповіді є назви з великими «ЛР», тому видно, що пошук кирилицею працює без урахування регістру. Останній GET, до <code>/api/tasks/2</code>, повертає вже один запис із цим номером.</p>
 
         <h2>Показ результату</h2>
 
-        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → створення, зміна й видалення.</strong> Покажи відповідь <code>201</code>, оновлене завдання і <code>404</code> після видалення.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>3. Enter → створення, зміна й видалення</strong></p>
 
-        <p class="line" onclick="markActive(this)">Створив завдання «Пробіжка 5 км». Сервер повернув 201 і адресу нового запису в заголовку <code>Location</code>. Після PUT повторний GET показав пріоритет 3 і статус «виконано». Видалення дало 204, а наступний GET — 404, бо запису вже немає.</p>
+        <p class="line" onclick="markActive(this)">Після POST перший рядок відповіді містить <code>201 Created</code>, а в заголовку <code>Location</code> є адреса нового завдання. У JSON нижче бачу назву «Пробіжка 5 км».</p>
 
-        <p class="line" onclick="markActive(this)">Зверну увагу на 204 після зміни й видалення. Це успішна відповідь без тіла, тому новий стан перевіряю окремим GET. У першому випадку бачимо змінений запис, у другому отримуємо 404.</p>
+        <p class="line" onclick="markActive(this)">Після PUT рядок <code>HTTP Status: 204</code> підтверджує, що зміни збережені. Наступний GET повертає те саме завдання з <code>priority: 3</code> і <code>done: true</code>. Після DELETE знову маю 204, а останній GET дає <code>404 Not Found</code>, бо запис уже видалено.</p>
 
-        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перевірка помилок.</strong> Покажи поле <code>errors</code> у відповіді. Якщо цього достатньо, на наступній паузі заверши показ через <code>Ctrl+C</code>.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>4. Enter → валідація. Ctrl+C на наступній паузі → завершення</strong></p>
 
-        <p class="line" onclick="markActive(this)">Для некоректних даних сервер повертає 400. У полі <code>errors</code> видно, що саме треба виправити, наприклад завеликий пріоритет або закоротку назву.</p>
+        <p class="line" onclick="markActive(this)">У першій команді надсилаю назву «x» і пріоритет 7. Відразу під командою сервер виводить помилки для полів запиту. Назва має бути від трьох символів, а пріоритет — від 1 до 3.</p>
 
-        <p class="line" onclick="markActive(this)">У першому прикладі «x» має менше трьох символів, а пріоритет 7 виходить за межі від 1 до 3. Окремо перевіряю посилання на неіснуючий проєкт. В обох випадках сервер відхиляє запит до того, як створити запис.</p>
+        <p class="line" onclick="markActive(this)">Нижче бачу <code>status: 400</code> для завдання, у якому <code>projectId</code> дорівнює 99. Такого проєкту немає. Остання відповідь теж має 400, бо в запиті задані недопустимі значення фільтра.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
