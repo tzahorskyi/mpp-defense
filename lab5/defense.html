@@ -238,25 +238,25 @@ COPY --from=build /app .</pre>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile.</strong> Покажи два етапи збірки в терміналі.</p>
 
-        <p class="line" onclick="markActive(this)">Перший етап збирає .NET-застосунок. Другий запускає готовий застосунок у меншому образі з середовищем виконання.</p>
+        <p class="line" onclick="markActive(this)">На першому етапі SDK збирає .NET-застосунок. У другий етап копіюю тільки готову збірку. Тому фінальний образ менший, а .NET SDK потрібен лише під час збірки.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → Docker Compose.</strong> Дочекайся статусів контейнерів.</p>
 
-        <p class="line" onclick="markActive(this)">Compose запускає PostgreSQL, чекає на готовність бази й запускає API.</p>
+        <p class="line" onclick="markActive(this)">У списку видно два контейнери. Спочатку PostgreSQL має пройти перевірку стану. Лише після цього Compose запускає API, яке підключається до бази.</p>
 
         <h2>Показ результату</h2>
 
         <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка API.</strong> Покажи відповідь <code>/health</code> і завдання «ЛР5 Docker» у виводі PostgreSQL.</p>
 
-        <p class="line" onclick="markActive(this)">Перевірка стану пройшла. Через API створив завдання, а запит до PostgreSQL підтверджує, що воно записалося в базу.</p>
+        <p class="line" onclick="markActive(this)">На <code>/health</code> отримав <code>Healthy</code>. Перевірка охоплює і з’єднання з базою. Через API створив завдання «ЛР5 Docker», а у виводі PostgreSQL видно відповідний рядок.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перезапуск.</strong> Дочекайся повторного пошуку завдання.</p>
 
-        <p class="line" onclick="markActive(this)">Після перезапуску контейнерів завдання лишилося. Дані PostgreSQL зберігаються в Docker volume.</p>
+        <p class="line" onclick="markActive(this)">Compose зупинив і видалив контейнери. Після повторного запуску пошук знову знаходить те саме завдання, бо дані PostgreSQL лежать у Docker volume, який Compose підключив до нового контейнера.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>5. Enter → дві архітектури.</strong> Покажи <code>linux/arm64</code>, <code>linux/amd64</code> та результати <code>uname</code>.</p>
 
-        <p class="line" onclick="markActive(this)">Один тег образу підтримує дві платформи. Запуск на arm64 показує aarch64, запуск на amd64 — x86_64.</p>
+        <p class="line" onclick="markActive(this)">Під одним тегом є образи для двох платформ. Запуск із параметром <code>--platform linux/arm64</code> показує <code>aarch64</code>, а <code>--platform linux/amd64</code> дає <code>x86_64</code>. Це видно у виводі <code>uname</code> всередині контейнера.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>

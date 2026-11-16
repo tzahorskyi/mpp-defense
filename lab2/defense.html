@@ -232,21 +232,21 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → читання.</strong> Покажи JSON зі списком проєктів і завдань.</p>
 
-        <p class="line" onclick="markActive(this)">Через GET отримую проєкти й завдання. У проєктів також видно кількість завдань і скільки з них виконано.</p>
+        <p class="line" onclick="markActive(this)">Через GET отримую JSON зі списком проєктів і завдань. Для кожного проєкту сервер одразу повертає загальну кількість завдань і кількість виконаних. Клієнту не потрібно рахувати це самому.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → фільтр і пошук.</strong> Покажи сортування за пріоритетом і результат пошуку <code>лр</code>.</p>
 
-        <p class="line" onclick="markActive(this)">Фільтр залишив невиконані завдання з потрібним пріоритетом. Пошук малими літерами знаходить назви з великими «ЛР».</p>
+        <p class="line" onclick="markActive(this)">Фільтр залишив невиконані завдання з пріоритетом від двох. Найвищий пріоритет іде першим, бо в запиті задано <code>sort=-priority</code>. Пошук «лр» знаходить і назви з великими «ЛР».</p>
 
         <h2>Показ результату</h2>
 
         <p class="line prep" onclick="markActive(this)"><strong>3. Enter → створення, зміна й видалення.</strong> Покажи відповідь <code>201</code>, оновлене завдання і <code>404</code> після видалення.</p>
 
-        <p class="line" onclick="markActive(this)">Створив «Пробіжку 5 км», після оновлення вивів її з новим пріоритетом і статусом «виконано». Видалив її, і повторний GET повернув 404.</p>
+        <p class="line" onclick="markActive(this)">Створив завдання «Пробіжка 5 км». Сервер повернув 201 і адресу нового запису в заголовку <code>Location</code>. Після PUT повторний GET показав пріоритет 3 і статус «виконано». Видалення дало 204, а наступний GET — 404, бо запису вже немає.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перевірка помилок.</strong> Покажи поле <code>errors</code> у відповіді. Якщо цього достатньо, на наступній паузі заверши показ через <code>Ctrl+C</code>.</p>
 
-        <p class="line" onclick="markActive(this)">Некоректний запит повертає 400 і пояснює, які поля треба виправити. Таким чином я перевірив повний цикл роботи із завданням і обробку помилок.</p>
+        <p class="line" onclick="markActive(this)">Для некоректних даних сервер повертає 400. У полі <code>errors</code> видно, що саме треба виправити, наприклад завеликий пріоритет або закоротку назву.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
