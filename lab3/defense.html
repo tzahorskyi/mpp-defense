@@ -203,7 +203,7 @@
         </div>
     </header>
     <main>
-        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Після запуску скрипта дочекайся двох адрес API. Кожен Enter виконує один і той самий крок на обох серверах.</p>
+        <p class="line prep" onclick="markActive(this)"><strong>Перед захистом.</strong> Скрипт відкриє Ubuntu <code>Zahorskyi_Ubuntu</code> у VirtualBox. Якщо вона попросить увійти, відкрий свій сеанс. Дочекайся двох адрес API, потім повертайся до термінала на Mac. Кожен Enter виконує один і той самий крок на обох серверах.</p>
 
         <div class="code-wrap"><button class="copy-btn" onclick="copyCode(this)">Копіювати</button><pre>cd ~/Desktop/unik/MPP
 ./demo.sh 3</pre></div>
@@ -212,7 +212,7 @@
 
         <h2>Паралельний запуск на двох ОС</h2>
 
-        <p class="line" onclick="markActive(this)">На початку в терміналі бачимо два рядки. <code>macOS (Darwin)</code> працює на порту 7080, а <code>Linux</code> у Docker — на 7180. Обидва сервери вже запущені. Це одна збірка API, а бази даних окремі, тому можна порівняти однакові запити.</p>
+        <p class="line" onclick="markActive(this)">У вікні VirtualBox бачимо робочий стіл Ubuntu. Повертаюся до термінала на Mac. Тут є два рядки з адресами API. <code>macOS (Darwin)</code> відповідає на порту 7080, а <code>Ubuntu у VirtualBox</code> — на 7180. В обох системах працює та сама збірка API. Бази окремі, тому можемо порівняти відповіді на однакові запити.</p>
 
         <h2>Код для показу</h2>
 
@@ -266,7 +266,7 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">У рядках <code>Location</code> різні порти, 7080 для macOS і 7180 для Linux. Далі кожен сервер повертає <code>Access-Control-Allow-Origin</code> з адресою <code>localhost:5173</code>. Під цими заголовками видно дві таблиці користувачів, по одній для кожної бази, зі стовпцем <code>HashPrefix</code>.</p>
 
-        <p class="line" onclick="markActive(this)">Обидва API ще працюють. У виводі можна зіставити 401 без токена, 403 для чужого завдання і 200 для адміністратора. Так бачимо, що перевірені правила доступу однаково працюють на macOS та Linux.</p>
+        <p class="line" onclick="markActive(this)">Обидва API ще працюють. У виводі бачимо 401 без токена, 403 для чужого завдання і 200 для адміністратора в обох блоках. Після останнього Enter скрипт зупинить обидва API. Робочий стіл Ubuntu залишиться відкритим.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>5. Enter → зупинка обох серверів</strong></p>
 
