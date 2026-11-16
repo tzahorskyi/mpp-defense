@@ -214,6 +214,8 @@
 
         <p class="line" onclick="markActive(this)">У вікні VirtualBox бачимо робочий стіл Ubuntu. Повертаюся до термінала на Mac. Тут є два рядки з адресами API. <code>macOS (Darwin)</code> відповідає на порту 7080, а <code>Ubuntu у VirtualBox</code> — на 7180. В обох системах працює та сама збірка API. Бази окремі, тому можемо порівняти відповіді на однакові запити.</p>
 
+        <p class="line prep" onclick="markActive(this)"><strong>Якщо попросять показати API зсередини Ubuntu.</strong> У терміналі вікна VirtualBox виконай <code>systemctl --user status mpp-lab3 --no-pager</code>. Під службою бачимо процес <code>dotnet Lab3.dll</code>. Потім повернися до термінала Mac для кроків по Enter.</p>
+
         <h2>Код для показу</h2>
 
         <p class="line prep" onclick="markActive(this)"><strong>Вхід і поточний користувач.</strong> <code>lab3/Program.cs:83</code> (рядки 83–87).</p>
