@@ -238,7 +238,7 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → реєстрація та невдалий вхід</strong></p>
 
-        <p class="line" onclick="markActive(this)">У першій команді під час реєстрації <code>alice</code> передаю <code>role: Admin</code>. У відповіді бачу <code>role: User</code> і статус 201. Це означає, що роль нового користувача призначив сервер.</p>
+        <p class="line" onclick="markActive(this)">У першій команді під час реєстрації <code>alice</code> передаю <code>role: Admin</code>. У відповіді бачимо <code>role: User</code> і статус 201. Це означає, що роль нового користувача призначив сервер.</p>
 
         <p class="line" onclick="markActive(this)">Нижче йдуть дві помилки. Некоректний запит на реєстрацію повернув <code>status: 400</code> і список проблемних полів. Запит на вхід із неправильним паролем повернув <code>status: 401</code>, бо сервер не підтвердив облікові дані.</p>
 
@@ -246,19 +246,19 @@ auth.MapGet(&quot;/me&quot;, [Authorize] (ClaimsPrincipal user) =&gt;           
 
         <p class="line" onclick="markActive(this)">У відповіді на успішний вхід є <code>accessToken</code>, <code>expiresAt</code> і роль. Це підписаний JWT із терміном дії. Наступні захищені запити передають його в заголовку <code>Authorization</code>.</p>
 
-        <p class="line" onclick="markActive(this)">У декодованому вмісті токена є <code>sub</code> — ідентифікатор користувача, а також <code>name</code>, <code>role</code> і <code>exp</code>. Останній запит до <code>/api/auth/me</code> повертає короткий JSON із користувачем <code>alice</code> та роллю <code>User</code>. За цим бачу, яку особу сервер розпізнав за токеном.</p>
+        <p class="line" onclick="markActive(this)">У декодованому вмісті токена є <code>sub</code> — ідентифікатор користувача, а також <code>name</code>, <code>role</code> і <code>exp</code>. Останній запит до <code>/api/auth/me</code> повертає короткий JSON із користувачем <code>alice</code> та роллю <code>User</code>. З цієї відповіді бачимо, яку особу сервер розпізнав за токеном.</p>
 
         <h2>Показ результату</h2>
 
         <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка прав доступу</strong></p>
 
-        <p class="line" onclick="markActive(this)">На початку цього виводу запит до <code>/api/tasks</code> без токена отримав <code>401</code>. Далі з токеном <code>taras</code> бачу його завдання, а з токеном <code>alice</code> — порожній список із відповіддю 200. Сервер прийняв запит, але в цього користувача ще немає власних завдань.</p>
+        <p class="line" onclick="markActive(this)">На початку цього виводу запит до <code>/api/tasks</code> без токена отримав <code>401</code>. Далі з токеном <code>taras</code> бачимо його завдання, а з токеном <code>alice</code> — порожній список із відповіддю 200. Сервер прийняв запит, але в цього користувача ще немає власних завдань.</p>
 
         <p class="line" onclick="markActive(this)">Нижче запит <code>alice</code> до <code>/api/tasks/1</code> дає <code>status: 403</code>. Сервер знає, хто звернувся, і перевірка показала, що завдання чуже. Коли той самий маршрут викликає адміністратор, у виводі з’являються номер і назва завдання.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → HTTPS, CORS і хеші паролів</strong></p>
 
-        <p class="line" onclick="markActive(this)">У відповіді на запит через HTTP бачу <code>307</code> і заголовок <code>Location</code> з адресою, яка починається на <code>https://</code>. Сервер перенаправив запит на захищене з’єднання.</p>
+        <p class="line" onclick="markActive(this)">У відповіді на запит через HTTP бачимо <code>307</code> і заголовок <code>Location</code> з адресою, яка починається на <code>https://</code>. Сервер перенаправив запит на захищене з’єднання.</p>
 
         <p class="line" onclick="markActive(this)">Нижче <code>Access-Control-Allow-Origin</code> містить <code>localhost:5173</code>. Це адреса браузерного клієнта, якому дозволено звертатися до API. У таблиці користувачів стовпець <code>HashPrefix</code> виводить початок хешу пароля. Імена секретів виводяться окремо, а їхні значення замасковані.</p>
 

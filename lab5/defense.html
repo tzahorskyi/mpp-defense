@@ -242,13 +242,13 @@ COPY --from=build /app .</pre>
 
         <p class="line prep" onclick="markActive(this)"><strong>1. Enter → Dockerfile і .dockerignore</strong></p>
 
-        <p class="line" onclick="markActive(this)">Термінал виводить <code>Dockerfile</code>. У першому <code>FROM</code> бачу образ .NET SDK, а далі — <code>dotnet publish</code>, який збирає програму. Другий <code>FROM</code> використовує ASP.NET Runtime, і команда <code>COPY --from=build</code> переносить туди готову збірку.</p>
+        <p class="line" onclick="markActive(this)">Термінал виводить <code>Dockerfile</code>. У першому <code>FROM</code> бачимо образ .NET SDK, а далі — <code>dotnet publish</code>, який збирає програму. Другий <code>FROM</code> використовує ASP.NET Runtime, і команда <code>COPY --from=build</code> переносить туди готову збірку.</p>
 
         <p class="line" onclick="markActive(this)">Під Dockerfile виводиться <code>.dockerignore</code>. Тут є <code>.env</code>, файли бази, <code>bin</code> та <code>obj</code>. Docker виключає їх із контексту збірки, тому в образ не потрапляють локальні налаштування і зайві файли.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → запуск Docker Compose</strong></p>
 
-        <p class="line" onclick="markActive(this)">Після запуску в таблиці <code>docker compose ps</code> бачу два сервіси, <code>db</code> і <code>api</code>. У рядку <code>db</code> є позначка <code>healthy</code>. Compose дочекався, поки PostgreSQL готовий приймати з’єднання, і запустив API.</p>
+        <p class="line" onclick="markActive(this)">Після запуску в таблиці <code>docker compose ps</code> бачимо два сервіси, <code>db</code> і <code>api</code>. У рядку <code>db</code> є позначка <code>healthy</code>. Compose дочекався, поки PostgreSQL готовий приймати з’єднання, і запустив API.</p>
 
         <p class="line" onclick="markActive(this)">Під таблицею виводяться налаштування контейнера API. У рядку підключення <code>Host=db</code> видно, що програма звертається до бази за іменем сервісу в мережі Compose. Пароль у цьому виводі замаскований.</p>
 
@@ -256,9 +256,9 @@ COPY --from=build /app .</pre>
 
         <p class="line prep" onclick="markActive(this)"><strong>3. Enter → перевірка API та запису в базі</strong></p>
 
-        <p class="line" onclick="markActive(this)">Під запитом до <code>/health</code> бачу <code>Healthy</code>. Це означає, що API відповідає і перевірка з’єднання з PostgreSQL пройшла.</p>
+        <p class="line" onclick="markActive(this)">Під запитом до <code>/health</code> бачимо <code>Healthy</code>. Це означає, що API відповідає і перевірка з’єднання з PostgreSQL пройшла.</p>
 
-        <p class="line" onclick="markActive(this)">Після POST у JSON бачу номер і назву «ЛР5 Docker». Нижче у таблиці з PostgreSQL є рядок із тією самою назвою й номером у стовпці <code>Id</code>. Це підтверджує, що завдання з відповіді API справді записано в базу.</p>
+        <p class="line" onclick="markActive(this)">Після POST у JSON бачимо номер і назву «ЛР5 Docker». Нижче у таблиці з PostgreSQL є рядок із тією самою назвою й номером у стовпці <code>Id</code>. Це підтверджує, що завдання з відповіді API справді записано в базу.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → перезапуск контейнерів</strong></p>
 
@@ -270,7 +270,7 @@ COPY --from=build /app .</pre>
 
         <p class="line" onclick="markActive(this)">У виводі перевірки образу під одним тегом є дві платформи, <code>linux/arm64</code> і <code>linux/amd64</code>. Нижче перший <code>uname -m</code> показує архітектуру комп’ютера.</p>
 
-        <p class="line" onclick="markActive(this)">Після команди запуску з <code>--platform linux/arm64</code> бачу <code>aarch64</code>. Після запуску з <code>--platform linux/amd64</code> — <code>x86_64</code>. Це вже результати з контейнерів. Тег той самий, а Docker запускає відповідний варіант образу.</p>
+        <p class="line" onclick="markActive(this)">Після команди запуску з <code>--platform linux/arm64</code> бачимо <code>aarch64</code>. Після запуску з <code>--platform linux/amd64</code> — <code>x86_64</code>. Це вже результати з контейнерів. Тег той самий, а Docker запускає відповідний варіант образу.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>

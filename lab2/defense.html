@@ -238,7 +238,7 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line" onclick="markActive(this)">Після першого GET у терміналі з’явився список проєктів. У кожному об’єкті видно <code>taskCount</code> і <code>doneCount</code>. Сервер одразу рахує, скільки в проєкті завдань і скільки з них виконано.</p>
 
-        <p class="line" onclick="markActive(this)">Нижче йде відповідь на GET <code>/api/tasks</code>. У кожному рядку бачу назву, пріоритет, стан <code>done</code> і назву проєкту в полі <code>project</code>. З такої відповіді вже можна заповнити список у клієнті.</p>
+        <p class="line" onclick="markActive(this)">Нижче йде відповідь на GET <code>/api/tasks</code>. У кожному рядку бачимо назву, пріоритет, стан <code>done</code> і назву проєкту в полі <code>project</code>. З такої відповіді вже можна заповнити список у клієнті.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>2. Enter → фільтр і пошук</strong></p>
 
@@ -250,15 +250,15 @@ tasks.MapGet(&quot;/{id:int}&quot;, async Task&lt;Results&lt;Ok&lt;TaskDto&gt;, 
 
         <p class="line prep" onclick="markActive(this)"><strong>3. Enter → створення, зміна й видалення</strong></p>
 
-        <p class="line" onclick="markActive(this)">Після POST перший рядок відповіді містить <code>201 Created</code>, а в заголовку <code>Location</code> є адреса нового завдання. У JSON нижче бачу назву «Пробіжка 5 км».</p>
+        <p class="line" onclick="markActive(this)">Після POST перший рядок відповіді містить <code>201 Created</code>, а в заголовку <code>Location</code> є адреса нового завдання. У JSON нижче бачимо назву «Пробіжка 5 км».</p>
 
-        <p class="line" onclick="markActive(this)">Після PUT рядок <code>HTTP Status: 204</code> підтверджує, що зміни збережені. Наступний GET повертає те саме завдання з <code>priority: 3</code> і <code>done: true</code>. Після DELETE знову маю 204, а останній GET дає <code>404 Not Found</code>, бо запис уже видалено.</p>
+        <p class="line" onclick="markActive(this)">Після PUT рядок <code>HTTP Status: 204</code> підтверджує, що зміни збережені. Наступний GET повертає те саме завдання з <code>priority: 3</code> і <code>done: true</code>. Після DELETE знову отримуємо 204, а останній GET дає <code>404 Not Found</code>, бо запис уже видалено.</p>
 
         <p class="line prep" onclick="markActive(this)"><strong>4. Enter → валідація. Ctrl+C на наступній паузі → завершення</strong></p>
 
         <p class="line" onclick="markActive(this)">У першій команді надсилаю назву «x» і пріоритет 7. Відразу під командою сервер виводить помилки для полів запиту. Назва має бути від трьох символів, а пріоритет — від 1 до 3.</p>
 
-        <p class="line" onclick="markActive(this)">Нижче бачу <code>status: 400</code> для завдання, у якому <code>projectId</code> дорівнює 99. Такого проєкту немає. Остання відповідь теж має 400, бо в запиті задані недопустимі значення фільтра.</p>
+        <p class="line" onclick="markActive(this)">Нижче бачимо <code>status: 400</code> для завдання, у якому <code>projectId</code> дорівнює 99. Такого проєкту немає. Остання відповідь теж має 400, бо в запиті задані недопустимі значення фільтра.</p>
 
         <p class="line" onclick="markActive(this)">Дякую за увагу.</p>
     </main>
