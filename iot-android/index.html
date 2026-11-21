@@ -142,7 +142,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <header class="scene-head"><p class="time">2:45–4:00</p><h2>Пристрої · підключення, створення, редагування</h2></header>
 <div class="phone-scene"><div><ol class="actions">
 <li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> → <strong>Demo sensor</strong>.</li>
-<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL симулятора з картки свого демонстраційного пристрою і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
+<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code> і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
 <li>Зміни опис на <code>Оновлено в Android</code> → натисни <strong>Зберегти</strong> → обери <strong>Demo CRUD</strong> повторно. Покажи нове значення.</li>
 <li>Якщо потрібно показати видалення, натисни <strong>Видалити</strong> саме для <strong>Demo CRUD</strong>. Повернися до <strong>Demo sensor</strong> із підготовленим правилом та історією.</li>
 </ol>
@@ -379,7 +379,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <h2>C · технічна якість проєкту</h2>
 <p>Ці критерії оцінюють продукт команди. Нижче — те, що я можу показати під час своєї частини.</p>
 <details class="details" id="c0"><summary>C0 · демонстрація операційних систем</summary><div>
-<p><strong>Android.</strong> У живому показі виконую <a href="#http">HTTP-тест</a> і <a href="#sync">офлайн-синхронізацію</a>. <strong>Windows.</strong> Якщо готова актуальна збірка, відкрий MAUI-клієнт на Windows, виконай той самий <code>GET simulator/normal</code> і покажи JSON. Коли клієнт та API на одній Windows-машині, API доступний на <code>http://localhost:5000</code>.</p>
+<p><strong>Android.</strong> У живому показі виконую <a href="#http">HTTP-тест</a> і <a href="#sync">офлайн-синхронізацію</a>. <strong>Windows.</strong> Якщо готова актуальна збірка, відкрий MAUI-клієнт на Windows, виконай той самий <code>GET simulator/normal</code> і покажи JSON. У Windows вкажи той самий спільний API <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>.</p>
 <p>Одна ОС дає 0,5 рівня C0, дві або більше — 1,0. <a href="evidence/windows-previous.png">Архівний кадр Windows</a> з попередньої локально виправленої збірки підійде як резерв ілюстрації. Для актуальної версії основний перевірений показ тут — Android. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf5999718bc87c5e4a0b99be4c6899aee0d/README.md">Інструкція Windows</a></p>
 </div></details>
 <details class="details" id="c1"><summary>C1 · приймальні тест-кейси</summary><div>
@@ -431,7 +431,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 </section>
 <section id="startup">
 <h2>E3 · запуск з нуля за README</h2><p class="cue"><strong>Покажи.</strong> Відкрий README і звір команди в терміналі. Критерій перевіряє, чи може інша людина повторити запуск за інструкцією в межах часу.</p>
-<p><a href="#auto-start">Покроковий запуск зі спільним API</a>. Нижче наведено команди локального запуску з README для перевірки E3.</p>
+<p>Для живого показу використовуй <a href="#android-connect">спільний API та підключення Android</a>. За критерієм E3 покажи <a href="#auto-start">команду запуску клієнта</a> і README.</p>
 <div class="panel" id="startup-note">
 <p><strong>Збірка для показу — 7198faf.</strong> Виправлення запуску вже в <code>main</code>. У <code>App</code> спочатку виконується <code>InitializeComponent()</code>, а <code>MainPage</code> створюється в <code>CreateWindow()</code>. Ресурси теми вже завантажені, коли сторінка читає <code>StaticResource Primary</code>.</p>
 <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues/123">Діагностика · issue №123</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/124/files">Виправлення · PR №124</a> · <a href="evidence/startup-crash.txt">Лог попередньої версії</a> · <a href="evidence/android-clean.png">Кадр чистої збірки</a></p>
@@ -441,42 +441,24 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
     public App(IServiceProvider services) { InitializeComponent(); this.services = services; }
     protected override Window CreateWindow(IActivationState? activationState) =&gt; new(new NavigationPage(services.GetRequiredService&lt;MainPage&gt;()));</code></pre><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf5999718bc87c5e4a0b99be4c6899aee0d/src/IoT.Mobile/App.xaml.cs#L4">Відкрити оригінальний файл і рядок</a></p></div></details>
 </div>
-<details class="details" id="api-start"><summary>Термінал 1 · API з актуального клону</summary><div>
-<p>Якщо відкритий локальний клон відповідає <code>7198faf</code>, працюй у ньому. Для окремого чистого запуску виконай команди в каталозі, де ще немає <code>iot-defense-demo</code>.</p>
-<pre><code>git clone https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic.git iot-defense-demo
-cd iot-defense-demo
-git switch --detach 7198faf
-ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/IoT.Api --urls http://127.0.0.1:5000</code></pre>
-<p>Для локального емулятора на macOS цього достатньо. Якщо запускаєш через <code>docker compose up --build</code>, адреса API для емулятора та сама, а URL пристрою на стороні контейнера — <code>http://127.0.0.1:8080</code>.</p>
-<p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf5999718bc87c5e4a0b99be4c6899aee0d/README.md">README</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf5999718bc87c5e4a0b99be4c6899aee0d/compose.yml">5000 → 8080 у Compose</a></p>
+<details class="details" id="api-start"><summary>Перевірити спільний API</summary><div>
+<pre><code>curl -fsS https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code></pre>
+<p>Очікувана відповідь містить <code>"status":"ok"</code>. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf5999718bc87c5e4a0b99be4c6899aee0d/README.md">README проєкту</a></p>
 </div></details>
-<details class="details" id="android-start"><summary>Термінал 2 · токен та APK</summary><div>
-<p>Запусти емулятор через Device Manager. Команди виконуй із кореня клону на 7198faf. Токен встав до початку показу екрана.</p>
-<pre><code>curl -fsS http://localhost:5000/
-curl -fsS -X POST http://localhost:5000/api/auth/token \
-  -H 'Content-Type: application/json' \
-  -d '{"user":"demo","role":"Admin","group":"default"}'
-
-dotnet workload restore src/IoT.Mobile/IoT.Mobile.csproj
-dotnet build src/IoT.Mobile -f net10.0-android -p:EmbedAssembliesIntoApk=true
-adb devices
-adb install -r src/IoT.Mobile/bin/Debug/net10.0-android/com.companyname.iot.mobile-Signed.apk</code></pre>
-<p>Якщо збірка не знаходить Android SDK або JDK, додай <code>-p:AndroidSdkDirectory=…</code> і <code>-p:JavaSdkDirectory=…</code>. На Mac <code>adb</code> зазвичай лежить у <code>~/Library/Android/sdk/platform-tools</code>. З кількома пристроями передай <code>adb -s &lt;ID&gt; install -r …</code>, де ID бере команда <code>adb devices</code>.</p>
-<p><strong>Перед показом перевір токен.</strong> У попередній Android-збірці недійсний токен міг закрити застосунок при HTTP 401. У такому разі відкрий його знову й встав новий токен.</p>
+<details class="details" id="android-start"><summary>Відкрити Android і підказки</summary><div>
+<pre><code>cd ~/Desktop/unik/MPP
+./demo-iot.sh</code></pre>
+<p>У полі <strong>Адреса сервера</strong> введи <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>. У поле <strong>Токен доступу</strong> встав виданий командою токен. Якщо клієнт уже відкритий, команда <code>./demo-iot.sh --guide</code> відкриє тільки підказки.</p>
 </div></details>
-<details class="details" id="device-seed"><summary>В Android · як підготувати Demo sensor</summary><div>
-<ol class="actions">
-<li>Натисни <strong>Підключити / оновити</strong>. Для створення нового ввійди у поля <strong>Назва</strong> та <strong>URL пристрою</strong>, введи <code>Demo sensor</code> та <code>http://127.0.0.1:5000</code> для прямого запуску .NET. Натисни <strong>Створити</strong> біля низу картки.</li>
-<li>У списку вибери <strong>Demo sensor</strong>. Прокрути до <strong>Правила діагностики</strong>. Для нового пристрою введи <code>temperature</code>, мінімум <code>0</code>, максимум <code>40</code>, натисни <strong>Додати</strong>.</li>
-<li>Двічі запусти <code>GET simulator/normal</code>. Повернися до верху. Якщо є черга з минулого прогону, синхронізуйся і перевір результат до початку показу.</li>
-</ol>
+<details class="details" id="device-seed"><summary>Дані для показу на спільному сервері</summary><div>
+<p>Після підключення вибери <strong>Demo sensor</strong>. URL пристрою <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>, правило <code>temperature</code> від <code>0</code> до <code>40</code> і два вимірювання <code>GET simulator/normal</code> уже збережені. Для показу створення та видалення використовуй окремий запис <strong>Demo CRUD</strong> з тим самим URL.</p>
 </div></details>
 </section>
 <section id="questions">
 <h2>E1 / E2 · запитання та зміни наживо</h2>
 <p>Це підготовлені відповіді за кодом проєкту. Для E1 звір їх із банком курсу.</p>
 <dl class="panel">
-<dt>Чому в Android адреса API 10.0.2.2, а у пристрою 127.0.0.1?</dt><dd>10.0.2.2 веде з Android Emulator на Mac. 127.0.0.1 в адресі пристрою інтерпретує бекенд, який звертається до свого симулятора.</dd>
+<dt>Чому адреси сервера і Demo sensor збігаються?</dt><dd>Android звертається до API за <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>. Для цього показу пристрій спрямовано на симулятор того самого сервера. Клієнт надсилає параметри тесту, а бекенд виконує запит до <code>simulator/normal</code>.</dd>
 <dt>Чим черга відрізняється від кешу?</dt><dd>Кеш — остання отримана копія списку. Черга — локальні операції, які треба відправити. Репозиторій накладає операції на копію перед показом.</dd>
 <dt>Що відбувається з 409 і з обривом мережі?</dt><dd>Остаточне відхилення позначається як невдала операція й не блокує решту. Збій зв’язку зупиняє синхронізацію, а невідправлені дані залишаються для наступної спроби.</dd>
 <dt>Чому є 200 і водночас попередження?</dt><dd>HTTP-код описує транспортну відповідь. Правило діагностики перевіряє зміст JSON, наприклад температуру поза діапазоном.</dd>
