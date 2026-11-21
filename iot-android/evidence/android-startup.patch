@@ -1,0 +1,22 @@
+diff --git a/src/IoT.Mobile/App.xaml.cs b/src/IoT.Mobile/App.xaml.cs
+index 6f58552..5d66efc 100644
+--- a/src/IoT.Mobile/App.xaml.cs
++++ b/src/IoT.Mobile/App.xaml.cs
+@@ -1,7 +1,14 @@
+ namespace IoT.Mobile;
+ public partial class App : Application
+ {
+-    private readonly MainPage page;
+-    public App(MainPage page) { InitializeComponent(); this.page = page; }
+-    protected override Window CreateWindow(IActivationState? activationState) => new(new NavigationPage(page));
++    private readonly IServiceProvider services;
++
++    public App(IServiceProvider services)
++    {
++        InitializeComponent();
++        this.services = services;
++    }
++
++    protected override Window CreateWindow(IActivationState? activationState) =>
++        new(new NavigationPage(services.GetRequiredService<MainPage>()));
+ }
