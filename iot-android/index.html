@@ -38,15 +38,13 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <main class="wrap">
 <section id="prep">
 <h2>Підготовка перед захистом</h2>
-<div class="panel">
-<ol class="actions">
-<li><strong>VS Code.</strong> Відкрий клон проєкту на <code>7198faf</code>. Підготуй вкладки <code>IoT.Mobile.csproj</code>, <code>MainPage.xaml</code>, <code>MainViewModel.cs</code>, <code>DeviceRepository.cs</code>, <code>SyncEngine.cs</code> і <code>ChartData.cs</code>. У VS Code <kbd>⌃G</kbd> відкриває перехід до номера рядка. Виправлення запуску вже є в main. <a href="#startup-note">Що змінив PR №124</a>. На сторінці також є фрагменти коду з точними посиланнями.</li>
-<li><strong>Terminal на Mac.</strong> Запусти API. У другій вкладці перевір, що він повертає <code>"status":"ok"</code>. Підготуй тестовий токен до початку показу.</li>
-<li><strong>Android Studio → Device Manager.</strong> Натисни <strong>▶</strong> біля <strong>mpp_phone</strong>. Відкрий <strong>IoT Diagnostics</strong>. Для API на цьому Mac вкажи <code>http://10.0.2.2:5000</code> й встав значення поля <code>token</code> в поле <strong>Токен доступу</strong>.</li>
-<li><strong>Дані для демонстрації.</strong> Підготуй <strong>Demo sensor</strong> з URL <code>http://127.0.0.1:5000</code>, правилом <code>temperature</code> у межах <code>0–40</code> і двома звичайними вимірюваннями. Підключися до API, щоб наповнити кеш. Перевір, що черга порожня.</li>
-<li><strong>Браузер.</strong> Відкрий <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/122">PR №122 з редизайном</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/112">PR №112 з офлайном</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/124">PR №124 із виправленням запуску</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/102#issuecomment-1698">своє рев’ю №102</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/actions/runs/61">IoT validation №61</a> і <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/actions/runs/62">SonarQube №62</a>. Тримай сценарій у сусідній вкладці.</li>
-</ol>
-<p class="refs"><a href="#startup">Повна підготовка і команди запуску</a> · <a href="#emulator">Перейти до кліків в Android</a> · <a href="#methodology">Знайти критерій з PDF</a></p>
+<div class="panel" id="auto-start">
+<p><strong>На своєму Mac відкрий Terminal і виконай одну команду.</strong></p>
+<pre><code>cd ~/Desktop/unik/MPP &amp;&amp; ./demo-iot.sh</code></pre>
+<p>Скрипт відкриє <strong>mpp_phone</strong>, збере й запустить IoT Diagnostics, запустить API, підставить адресу й тестовий токен. У застосунку буде вибрано <strong>Demo sensor</strong> з правилом <code>temperature</code> <code>0–40</code> і двома вимірюваннями. Також відкриються файли у VS Code та вкладки Forgejo.</p>
+<p>Дочекайся в терміналі <strong>«Готово. Android … · Demo sensor вибрано»</strong>. Перша збірка може зайняти кілька хвилин. Порт буде вказано в терміналі. Залиш це вікно відкритим до кінця показу.</p>
+<p>Якщо скрипт завантажено у Downloads, виконай <code>bash ~/Downloads/demo-iot.sh</code>.</p>
+<p class="refs"><a href="evidence/demo-iot.sh" download>Завантажити demo-iot.sh</a> · <a href="#startup">Ручний запуск за README для E3</a> · <a href="#emulator">Перейти до дій в Android</a> · <a href="#methodology">Критерії PDF</a></p>
 </div>
 </section>
 <section class="scene" id="opening" data-scene>
@@ -133,7 +131,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <header class="scene-head"><p class="time">2:45–4:00</p><h2>Пристрої · підключення, створення, редагування</h2></header>
 <div class="phone-scene"><div><ol class="actions">
 <li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> → <strong>Demo sensor</strong>.</li>
-<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL <code>http://127.0.0.1:5000</code> і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
+<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL із картки <strong>Demo sensor</strong> (той самий порт, який вказав скрипт) і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
 <li>Зміни опис на <code>Оновлено в Android</code> → натисни <strong>Зберегти</strong> → обери <strong>Demo CRUD</strong> повторно. Покажи нове значення.</li>
 <li>Якщо потрібно показати видалення, натисни <strong>Видалити</strong> саме для <strong>Demo CRUD</strong>. Повернися до <strong>Demo sensor</strong> із підготовленим правилом та історією.</li>
 </ol>
@@ -422,6 +420,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 </section>
 <section id="startup">
 <h2>E3 · запуск з нуля за README</h2><p class="cue"><strong>Покажи.</strong> Відкрий README і звір команди в терміналі. Критерій перевіряє, чи може інша людина повторити запуск за інструкцією в межах часу.</p>
+<p><a href="#auto-start">Швидкий автоматичний запуск на Mac</a>. Нижче — ручний шлях і порти з README для перевірки E3.</p>
 <div class="panel" id="startup-note">
 <p><strong>Збірка для показу — 7198faf.</strong> Виправлення запуску вже в <code>main</code>. У <code>App</code> спочатку виконується <code>InitializeComponent()</code>, а <code>MainPage</code> створюється в <code>CreateWindow()</code>. Ресурси теми вже завантажені, коли сторінка читає <code>StaticResource Primary</code>.</p>
 <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues/123">Діагностика · issue №123</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/124/files">Виправлення · PR №124</a> · <a href="evidence/startup-crash.txt">Лог попередньої версії</a> · <a href="evidence/android-clean.png">Кадр чистої збірки</a></p>
