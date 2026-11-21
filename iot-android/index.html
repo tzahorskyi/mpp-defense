@@ -53,7 +53,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <ol class="actions">
 <li>В Android відкрий <strong>IoT Diagnostics</strong>. У «Адреса сервера» встав <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>.</li>
 <li>У «Токен доступу» встав виданий командою токен до поширення екрана. Натисни <strong>Підключити / оновити</strong> і дочекайся списку.</li>
-<li>Вибери свій демонстраційний пристрій. Для HTTP-тестів підготуй пристрій із симулятором, правилом <code>temperature</code> <code>0–40</code> і двома звичайними вимірюваннями. Перевір, що черга порожня. Повернися в Terminal і натисни <kbd>Enter</kbd>.</li>
+<li>Вибери <strong>Demo sensor</strong>. На спільному API для нього підготовлено правило <code>temperature</code> <code>0–40</code> і два звичайні вимірювання. Перевір, що черга порожня. Повернися в Terminal і натисни <kbd>Enter</kbd>.</li>
 </ol>
 <p class="caption-note">На скриншотах попередньої репетиції показано локальну адресу. Для цього показу використовуй спільний HTTPS-ендпоінт вище.</p>
 <nav aria-label="Кроки скрипта"><ol class="jump-grid"><li><a href="#android-connect">01 · Підключення до API</a></li><li><a href="#opening">02 · Вступ</a></li><li><a href="#architecture">03 · Код і редизайн</a></li><li><a href="#devices">04 · Пристрої</a></li><li><a href="#http">05 · HTTP-тест</a></li><li><a href="#alerts">06 · Аномалія і графік</a></li><li><a href="#offline">07 · Офлайн</a></li><li><a href="#sync">08 · Синхронізація</a></li><li><a href="#git-proof">09 · Forgejo і мій внесок</a></li><li><a href="#actions">10 · Тести, Actions і підсумок</a></li></ol></nav>
@@ -141,7 +141,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <section class="scene" id="devices" data-scene>
 <header class="scene-head"><p class="time">2:45–4:00</p><h2>Пристрої · підключення, створення, редагування</h2></header>
 <div class="phone-scene"><div><ol class="actions">
-<li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> і вибери свій демонстраційний пристрій (на скриншотах він називається <strong>Demo sensor</strong>).</li>
+<li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> → <strong>Demo sensor</strong>.</li>
 <li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL симулятора з картки свого демонстраційного пристрою і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
 <li>Зміни опис на <code>Оновлено в Android</code> → натисни <strong>Зберегти</strong> → обери <strong>Demo CRUD</strong> повторно. Покажи нове значення.</li>
 <li>Якщо потрібно показати видалення, натисни <strong>Видалити</strong> саме для <strong>Demo CRUD</strong>. Повернися до <strong>Demo sensor</strong> із підготовленим правилом та історією.</li>

@@ -22,7 +22,7 @@ REV = "7198faf5999718bc87c5e4a0b99be4c6899aee0d"
 PACKAGE = "com.companyname.iot.mobile"
 CACHE = Path.home() / "Library/Caches/mpp-iot-defense"
 STEPS = (
-    ("android-connect", "Підключення до API", "В Android введи адресу й токен. Натисни «Підключити / оновити», обери свій демонстраційний пристрій."),
+    ("android-connect", "Підключення до API", "В Android введи адресу й токен. Натисни «Підключити / оновити» й обери Demo sensor."),
     ("opening", "Вступ", "Покажи шапку, картку підключення та пристрої. Назви свою частину проєкту."),
     ("architecture", "Код і редизайн", "У VS Code покажи IoT.Mobile.csproj, BindingContext, MainPage.xaml і команди ViewModel."),
     ("devices", "Пристрої", "Покажи список. Для створення й редагування використай свій тестовий запис Demo CRUD."),
