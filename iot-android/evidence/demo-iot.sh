@@ -107,13 +107,11 @@ def connect_android(adb, address, token):
         x0, y0, x1, y1 = map(int, re.findall(r"\d+", node.get("bounds", "")))
         adb("shell", "input", "tap", str((x0 + x1) // 2), str((y0 + y1) // 2))
 
-    def set_text(node, value):
+    def focus_and_clear(node):
         tap(node)
         time.sleep(0.9)
         adb("shell", "input", "keycombination", "113", "29")
         adb("shell", "input", "keyevent", "67")
-        for offset in range(0, len(value), 36):
-            adb("shell", "input", "text", value[offset:offset + 36])
 
     def token_entry():
         return next((n for n in nodes() if n.get("password") == "true"), None)
@@ -129,18 +127,26 @@ def connect_android(adb, address, token):
 
     entry = wait_for("поля адреси в Android", address_entry, 90)
     if entry.get("text") != address:
-        set_text(entry, address)
+        focus_and_clear(entry)
+        adb("shell", "input", "text", address)
         adb("shell", "input", "keyevent", "4")
         wait_for("оновленої адреси API", lambda: labels(address), 15)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", token):
         raise RuntimeError("API повернув токен у несподіваному форматі.")
     try:
-        secret_field = wait_for("поля токена", token_entry, 15)
-        set_text(secret_field, token)
-        def has_full_token():
-            field = token_entry()
-            return field is not None and len(field.get("text", "")) == len(token)
-        wait_for("повного токена в полі Android", has_full_token, 20)
+        length = -1
+        for chunk_size in (32, 12):
+            secret_field = wait_for("поля токена", token_entry, 25)
+            focus_and_clear(secret_field)
+            for offset in range(0, len(token), chunk_size):
+                adb("shell", "input", "text", token[offset:offset + chunk_size])
+            visible = wait_for("стану поля токена", token_entry, 25)
+            length = len(visible.get("text", ""))
+            if length == len(token):
+                break
+            print(f"Повторю ввід токена: Android прийняв {length} із {len(token)} символів.")
+        else:
+            raise RuntimeError(f"Поле токена прийняло {length} із {len(token)} символів.")
         adb("shell", "input", "keyevent", "4")
     except subprocess.SubprocessError:
         raise RuntimeError("Android не прийняв тестовий токен.") from None
@@ -165,6 +171,28 @@ def open_materials(source):
                     ROOT + "/pulls/122", ROOT + "/pulls/112", ROOT + "/pulls/124",
                     ROOT + "/pulls/102#issuecomment-1698", ROOT + "/actions/runs/61",
                     ROOT + "/actions/runs/62", "https://tzahorskyi.github.io/mpp-defense/iot-android/#prep"], check=False)
+
+def isolate_avd(scope):
+    avd_home = Path(os.environ.get("ANDROID_AVD_HOME") or
+                    Path(os.environ.get("ANDROID_EMULATOR_HOME") or
+                         os.environ.get("ANDROID_USER_HOME") or Path.home() / ".android") / "avd")
+    profile = avd_home / "mpp_phone.ini"
+    settings = dict(line.split("=", 1) for line in profile.read_text().splitlines() if "=" in line)
+    original = Path(settings.get("path", "")).expanduser()
+    if not original.is_dir():
+        original = avd_home.parent / settings.get("path.rel", "avd/mpp_phone.avd")
+    # Copy the profile and base disk. The .qcow2 overlay holds the user's changes.
+    isolated_home = Path(scope.enter_context(tempfile.TemporaryDirectory(prefix="avd-", dir=CACHE)))
+    isolated_device = isolated_home / "mpp_phone.avd"
+    isolated_device.mkdir()
+    shutil.copyfile(original / "config.ini", isolated_device / "config.ini")
+    base_disk = original / "userdata-qemu.img"
+    if base_disk.is_file() and (original / "userdata-qemu.img.qcow2").is_file():
+        shutil.copyfile(base_disk, isolated_device / base_disk.name)
+    settings.pop("path.rel", None)
+    settings["path"] = str(isolated_device)
+    (isolated_home / profile.name).write_text("".join(f"{key}={value}\n" for key, value in settings.items()))
+    return dict(os.environ, ANDROID_AVD_HOME=str(isolated_home))
 
 def main():
     parser = argparse.ArgumentParser(prog="demo-iot.sh", description="Запустити API, Android та матеріали до захисту IoT Diagnostic Platform.")
@@ -203,11 +231,13 @@ def main():
         print(f"Запускаю mpp_phone ({serial}).")
         emu_log = scope.enter_context((logs / "emulator.log").open("w"))
         emulator_process = subprocess.Popen(
-            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-memory", "3072", "-read-only", "-no-snapshot", "-no-audio"],
-            stdout=emu_log, stderr=subprocess.STDOUT, start_new_session=True)
+            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-memory", "3072", "-no-snapshot", "-no-audio"],
+            stdout=emu_log, stderr=subprocess.STDOUT, start_new_session=True, env=isolate_avd(scope))
         scope.callback(stop, emulator_process)
 
         def adb(*command, timeout=30):
+            if emulator_process.poll() is not None:
+                raise RuntimeError(f"Емулятор завершив роботу. Відкрий {logs / 'emulator.log'}.")
             return run(str(platform_adb), "-s", serial, *command, timeout=timeout)
 
         build_log = scope.enter_context((logs / "build.log").open("w"))
@@ -236,21 +266,26 @@ def main():
         adb("shell", "svc", "wifi", "enable")
         apk = source / "src/IoT.Mobile/bin/Debug/net10.0-android" / f"{PACKAGE}-Signed.apk"
         print("Встановлюю APK та підключаю Android до API.")
-        # This emulator is read-only. Reset only its disposable copy of the app data.
-        if f"package:{PACKAGE}" in adb("shell", "pm", "list", "packages", PACKAGE).splitlines():
-            if adb("shell", "pm", "clear", PACKAGE) != "Success":
-                raise RuntimeError("Не вдалося очистити дані застосунку в тимчасовій копії емулятора.")
-        try:
-            adb("install", "--incremental", "-r", str(apk), timeout=55)
-        except subprocess.SubprocessError:
-            print("Повторю встановлення APK звичайним способом.")
-            adb("install", "--no-incremental", "-r", str(apk), timeout=240)
+        # Install from a local file in the guest so package extraction does not depend on an ADB stream.
+        guest_apk = "/data/local/tmp/mpp-iot-defense.apk"
+        adb("push", str(apk), guest_apk, timeout=90)
+        result = adb("shell", "pm", "install", "-r", guest_apk, timeout=180)
+        if result != "Success":
+            raise RuntimeError(f"Android не встановив APK: {result}")
         component = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()[-1]
         if not component.startswith(PACKAGE + "/"):
             raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
-        wait_for("запуску IoT Diagnostics", lambda: "Starting:" in adb("shell", "am", "start", "-n", component, timeout=10), 55)
-        connect_android(adb, address, token)
-        print(f"Готово. Android {address} · Demo sensor вибрано.")
+        try:
+            wait_for("запуску IoT Diagnostics", lambda: "Starting:" in adb("shell", "am", "start", "-n", component, timeout=10), 55)
+            connect_android(adb, address, token)
+            print(f"Готово. Android {address} · Demo sensor вибрано.")
+        except (RuntimeError, subprocess.SubprocessError) as error:
+            try:
+                (logs / "android-crash.log").write_text(adb("logcat", "-d", "-b", "crash", timeout=10))
+            except subprocess.SubprocessError:
+                pass
+            print(f"API й емулятор запущені. Автопідключення не завершилося: {error}")
+            print(f"Для ручного підключення введи {address}. Створи свіжий токен за інструкцією E3.")
         if not args.no_tabs:
             open_materials(source)
         print("Залиш термінал відкритим на час показу. Ctrl+C зупиняє це демо.")
