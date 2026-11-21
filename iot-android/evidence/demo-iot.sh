@@ -7,6 +7,7 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import platform
 import re
 import secrets
 import shutil
@@ -178,8 +179,9 @@ def isolate_avd(scope):
                          os.environ.get("ANDROID_USER_HOME") or Path.home() / ".android") / "avd")
     profile = avd_home / "mpp_phone.ini"
     settings = dict(line.split("=", 1) for line in profile.read_text().splitlines() if "=" in line)
-    original = Path(settings.get("path", "")).expanduser()
-    if not original.is_dir():
+    path = settings.get("path")
+    original = Path(path).expanduser() if path else None
+    if original is None or not original.is_dir():
         original = avd_home.parent / settings.get("path.rel", "avd/mpp_phone.avd")
     # Copy the profile and base disk. The .qcow2 overlay holds the user's changes.
     isolated_home = Path(scope.enter_context(tempfile.TemporaryDirectory(prefix="avd-", dir=CACHE)))
@@ -221,6 +223,9 @@ def main():
         logs = Path(tempfile.mkdtemp(prefix="run-", dir=CACHE))
         print(f"Журнали запуску: {logs}")
         source = prepare_source(args.source)
+        android_rid = {"arm64": "android-arm64", "x86_64": "android-x64"}.get(platform.machine())
+        if android_rid is None:
+            raise RuntimeError("Не вдалося визначити архітектуру Android для цього Mac.")
         port = next((p for p in [5000, *range(15580, 15600)] if free(p)), None)
         emu_port = next((p for p in range(5580, 5600, 2) if free(p) and free(p + 1)), None)
         if port is None or emu_port is None:
@@ -231,7 +236,7 @@ def main():
         print(f"Запускаю mpp_phone ({serial}).")
         emu_log = scope.enter_context((logs / "emulator.log").open("w"))
         emulator_process = subprocess.Popen(
-            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-memory", "3072", "-no-snapshot", "-no-audio"],
+            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-memory", "2048", "-no-snapshot", "-no-audio"],
             stdout=emu_log, stderr=subprocess.STDOUT, start_new_session=True, env=isolate_avd(scope))
         scope.callback(stop, emulator_process)
 
@@ -246,7 +251,7 @@ def main():
             subprocess.run(["dotnet", "build", "src/IoT.Api", "--nologo"],
                            cwd=source, stdout=build_log, stderr=subprocess.STDOUT, check=True, timeout=480)
             subprocess.run(["dotnet", "build", "src/IoT.Mobile", "--nologo", "-f", "net10.0-android",
-                            "-p:EmbedAssembliesIntoApk=true", f"-p:JavaSdkDirectory={java}", f"-p:AndroidSdkDirectory={sdk}"],
+                            "-r", android_rid, "-p:EmbedAssembliesIntoApk=true", f"-p:JavaSdkDirectory={java}", f"-p:AndroidSdkDirectory={sdk}"],
                            cwd=source, stdout=build_log, stderr=subprocess.STDOUT, check=True, timeout=720)
         except subprocess.SubprocessError:
             raise RuntimeError(f"Помилка або таймаут збірки. Відкрий {logs / 'build.log'}. Якщо бракує MAUI, виконай dotnet workload restore src/IoT.Mobile/IoT.Mobile.csproj у клоні.") from None
@@ -261,31 +266,37 @@ def main():
         scope.callback(stop, api_process)
         token = prepare_api(base)
         print(f"API готовий на {base}. Створено Demo sensor, правило 0–40 і два вимірювання.")
-        wait_for(f"завантаження {serial}", lambda: adb("shell", "getprop", "sys.boot_completed") == "1", 120)
+        wait_for(f"завантаження {serial}", lambda: adb("shell", "getprop", "sys.boot_completed") == "1", 180)
         adb("shell", "cmd", "connectivity", "airplane-mode", "disable")
         adb("shell", "svc", "wifi", "enable")
-        apk = source / "src/IoT.Mobile/bin/Debug/net10.0-android" / f"{PACKAGE}-Signed.apk"
+        apk = source / "src/IoT.Mobile/bin/Debug/net10.0-android" / android_rid / f"{PACKAGE}-Signed.apk"
         print("Встановлюю APK та підключаю Android до API.")
-        # Install from a local file in the guest so package extraction does not depend on an ADB stream.
-        guest_apk = "/data/local/tmp/mpp-iot-defense.apk"
-        adb("push", str(apk), guest_apk, timeout=90)
-        result = adb("shell", "pm", "install", "-r", guest_apk, timeout=180)
-        if result != "Success":
-            raise RuntimeError(f"Android не встановив APK: {result}")
-        component = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()[-1]
-        if not component.startswith(PACKAGE + "/"):
-            raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
+        installed = False
         try:
+            # Install from a local file so package extraction does not depend on an ADB stream.
+            guest_apk = "/data/local/tmp/mpp-iot-defense.apk"
+            adb("push", str(apk), guest_apk, timeout=90)
+            if adb("shell", "pm", "install", "-r", guest_apk, timeout=120) != "Success":
+                raise RuntimeError("Android не встановив APK.")
+            installed = True
+            activities = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()
+            component = next((line for line in activities if line.startswith(PACKAGE + "/")), None)
+            if component is None:
+                raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
             wait_for("запуску IoT Diagnostics", lambda: "Starting:" in adb("shell", "am", "start", "-n", component, timeout=10), 55)
             connect_android(adb, address, token)
             print(f"Готово. Android {address} · Demo sensor вибрано.")
         except (RuntimeError, subprocess.SubprocessError) as error:
             try:
                 (logs / "android-crash.log").write_text(adb("logcat", "-d", "-b", "crash", timeout=10))
-            except subprocess.SubprocessError:
+            except (RuntimeError, subprocess.SubprocessError):
                 pass
-            print(f"API й емулятор запущені. Автопідключення не завершилося: {error}")
-            print(f"Для ручного підключення введи {address}. Створи свіжий токен за інструкцією E3.")
+            detail = str(error) if isinstance(error, RuntimeError) else "ADB не завершив операцію."
+            print(f"Підготовка Android не завершилася. {detail}")
+            if installed:
+                print(f"Для ручного підключення введи {address}. Створи свіжий токен за інструкцією E3.")
+            else:
+                print(f"API працює на {base}. Діагностика Android: {logs}.")
         if not args.no_tabs:
             open_materials(source)
         print("Залиш термінал відкритим на час показу. Ctrl+C зупиняє це демо.")
