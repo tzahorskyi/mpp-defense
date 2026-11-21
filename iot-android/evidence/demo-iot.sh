@@ -127,7 +127,7 @@ def connect_android(adb, address, token):
         return next((n for n in screen
                      if n.get("class") == "android.widget.EditText" and n.get("password") != "true"), None)
 
-    entry = wait_for("поля адреси в Android", address_entry, 60)
+    entry = wait_for("поля адреси в Android", address_entry, 90)
     if entry.get("text") != address:
         set_text(entry, address)
         adb("shell", "input", "keyevent", "4")
@@ -248,7 +248,7 @@ def main():
         component = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()[-1]
         if not component.startswith(PACKAGE + "/"):
             raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
-        adb("shell", "am", "start", "-W", "-n", component, timeout=50)
+        wait_for("запуску IoT Diagnostics", lambda: "Starting:" in adb("shell", "am", "start", "-n", component, timeout=10), 55)
         connect_android(adb, address, token)
         print(f"Готово. Android {address} · Demo sensor вибрано.")
         if not args.no_tabs:
