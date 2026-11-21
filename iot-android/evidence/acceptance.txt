@@ -1,0 +1,12 @@
+PASS  anonymous request is rejected
+PASS  invalid device is rejected
+PASS  rule set is replaced
+PASS  viewer cannot run requests
+PASS  scenario normal is recorded
+PASS  scenario out-of-range is recorded
+PASS  scenario error is recorded
+PASS  scenario invalid-json is recorded
+PASS  scenario timeout is recorded
+PASS  workers recorded 7 checks, 7 audit entries, lease owners ['worker-2'], 0 events pending
+PASS  no errors or unhandled exceptions in 3 node logs
+acceptance failures: 0

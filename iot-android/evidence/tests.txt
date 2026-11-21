@@ -1,0 +1,2 @@
+Passed!  - Failed:     0, Passed:   245, Skipped:     0, Total:   245, Duration: 397 ms - IoT.UnitTests.dll (net10.0)
+Passed!  - Failed:     0, Passed:   110, Skipped:     0, Total:   110, Duration: 11 s - IoT.IntegrationTests.dll (net10.0)

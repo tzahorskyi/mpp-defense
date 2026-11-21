@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<title>Захист на Android · IoT Diagnostic Platform</title>
+<style>
+:root{color-scheme:light;--ink:#17211d;--muted:#526059;--line:#ced6cd;--wash:#f3f5ef;--paper:#fcfcf8;--green:#155637;--deep:#102e24;--lime:#d8eda9;font-family:"Avenir Next","Trebuchet MS",sans-serif;line-height:1.55}
+*{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink)}a{color:var(--green);text-underline-offset:.18em}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible{outline:2px solid #288050;outline-offset:4px}h1,h2,h3,p{margin-top:0}h1,h2{font-family:Georgia,serif;font-weight:500;line-height:1.06}h1{font-size:clamp(2.5rem,7.5vw,5.5rem);letter-spacing:-.055em;margin-bottom:.24em}h2{font-size:clamp(1.85rem,4vw,2.75rem);letter-spacing:-.038em;margin-bottom:.55em}h3{font-size:1.15rem;line-height:1.25;margin-bottom:.48em}p:last-child,ul:last-child,ol:last-child{margin-bottom:0}code{font: .875em/1.5 ui-monospace,monospace;overflow-wrap:anywhere;background:#e8ede4;padding:.08em .24em}pre{font:.85rem/1.55 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--deep);color:#eff6e8;padding:1rem;margin:0 0 1rem}pre code{background:none;padding:0;font:inherit}.wrap{width:min(100% - 2.5rem,68rem);margin-inline:auto}.hero{background:var(--deep);color:#f4f7eb;padding:clamp(2.8rem,7vw,5rem) 0 2.7rem;border-top:6px solid var(--lime)}.hero p{font-size:1.08rem}.hero a{color:var(--lime)}.kicker,.time,.label,.criterion{font:700 .81rem/1.4 ui-monospace,monospace;letter-spacing:.06em}.kicker{color:var(--lime);margin-bottom:1.2rem}.nav{border-block:1px solid var(--line);background:var(--paper)}.nav ul{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;list-style:none;margin-block:0;padding-block:.8rem;padding-left:0}.nav a{font-weight:650}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(15rem,20rem);gap:2rem;align-items:start;padding-top:2rem}.panel{background:var(--paper);border:1px solid var(--line);padding:clamp(1rem,3vw,1.75rem)}.panel h2{font-size:1.75rem}.panel ul{padding-left:1.12rem}.panel li+li{margin-top:.55rem}.timeline{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}.step{display:grid;grid-template-columns:7.45rem minmax(0,1fr);gap:.6rem 1rem;padding:1.15rem 0;border-bottom:1px solid var(--line)}.time{color:var(--green);font-variant-numeric:tabular-nums;padding-top:.15rem}.say{margin:.7rem 0 0;padding:.66rem .8rem;border-left:3px solid #67a27d;background:#e9f0e3}.label{display:block;color:var(--green);margin-bottom:.27rem}.step p{margin-bottom:.45rem}.step p:last-child{margin-bottom:0}.refs{margin-block:.6rem 0;font-size:.92rem}.wide{padding-top:2.4rem}.wide>section{margin-bottom:2.2rem}.details{background:var(--paper);border:1px solid var(--line);margin:.6rem 0}.details summary{font-weight:700;cursor:pointer;padding:.82rem 1rem}.details[open] summary{border-bottom:1px solid var(--line)}.details>div{padding:1rem}.criterion{color:var(--green);margin-right:.48rem}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left;font-size:.92rem}td,th{vertical-align:top;padding:.58rem .65rem;border-bottom:1px solid var(--line)}thead{background:#edf1e8}tbody tr:last-child td{border-bottom:0}td:first-child{min-width:7.6rem}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.gallery figure{margin:0;min-width:0}.gallery a{display:block;background:#e9ede6;border:1px solid var(--line)}.gallery img{display:block;width:100%;height:clamp(12rem,34vw,24rem);object-fit:contain}figcaption{font-size:.9rem;margin-top:.45rem}.muted,footer{color:var(--muted)}footer{padding:1rem 0 2rem;border-top:1px solid var(--line);font-size:.9rem}dt{font-weight:700}dd{margin:0 0 .8rem}
+@media(max-width:750px){.layout{grid-template-columns:1fr;gap:1.25rem}.panel{grid-row:1}.step{grid-template-columns:1fr;gap:.35rem}.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}th,td{padding:.48rem}.wrap{width:calc(100% - 1.5rem)}}
+@media(max-width:385px){.gallery{grid-template-columns:1fr}}
+@media print{body,.hero,.say{background:white;color:black}.hero{border:none;padding:0}.hero a,.kicker{color:black}.nav,.gallery{display:none}.wrap{width:100%}.layout{display:block}.panel,.step{break-inside:avoid}.panel{margin-bottom:1rem}.wide{padding-top:1rem}.details{break-inside:avoid}a{color:black}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">МУЛЬТИПЛАТФОРМНЕ ПРОГРАМУВАННЯ</p>
+    <h1>Демонстрація на Android</h1>
+    <p><strong>IoT Diagnostic Platform</strong> · Тарас Загорський · ІПЗ-31</p>
+    <p><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo">Репозиторій проєкту</a></p>
+  </div>
+</header>
+<nav class="nav" aria-label="Розділи сценарію"><ul class="wrap"><li><a href="#demo">Сценарій на 6 хв</a></li><li><a href="#evidence">Докази за критеріями</a></li><li><a href="#screens">Резервні скриншоти</a></li><li><a href="#questions">Питання й мікрозміни</a></li></ul></nav>
+<main>
+<div class="layout wrap">
+  <section id="demo">
+    <h2>Що показувати й говорити</h2>
+    <ol class="timeline">
+      <li class="step"><span class="time">0:00–0:35</span><div><h3>Представити проєкт і свою частину</h3><p>Відкрий запущений застосунок. Покажи поле адреси й картку приладу.</p><div class="say"><span class="label">Сказати</span>Я Тарас Загорський. Платформа перевіряє HTTP API IoT-пристроїв, зберігає вимірювання та створює попередження. Я відповідав за клієнт .NET MAUI для Android і Windows. Реалізував роботу з пристроями, редактор запитів, відображення результатів та офлайн-режим із синхронізацією. Зараз покажу це на Android.</div></div></li>
+      <li class="step"><span class="time">0:35–1:35</span><div><h3>Підключити пристрій і виконати тест</h3><p>Натисни <strong>Підключити / оновити</strong> → <strong>Оберіть пристрій</strong> → <strong>Demo sensor</strong>. У блоці <strong>HTTP тест</strong> залиш <code>GET</code>, шлях <code>simulator/normal</code> і натисни <strong>Виконати тест</strong>. Покажи HTTP 200, мілісекунди та JSON.</p><div class="say"><span class="label">Сказати</span>Клієнт надсилає налаштування тесту на ASP.NET Core API. Сервер звертається до симулятора та зберігає вимірювання. На екрані видно HTTP-статус відповіді пристрою, час і тіло JSON.</div></div></li>
+      <li class="step"><span class="time">1:35–2:45</span><div><h3>Викликати аномалію і показати графік</h3><p>У правилі вже задано <code>temperature</code> від <code>0</code> до <code>40</code>. Заміни шлях на <code>simulator/out-of-range</code> й виконай тест. Покажи <code>temperature: 150</code>, попередження та історію. Для графіка залиш <code>temperature</code> і натисни <strong>Оновити графік</strong>. За наявності часу підтвердь нове попередження або відкрий <strong>Експортувати CSV</strong>.</p><div class="say"><span class="label">Сказати</span>Симулятор повернув HTTP 200, але температура 150 виходить за межі. Сервер створює попередження, а клієнт показує його поряд з історією. Для довгих рядів графік обмежує кількість точок до 120 і зберігає форму сигналу через LTTB.</div></div></li>
+      <li class="step"><span class="time">2:45–4:15</span><div><h3>Показати кеш, чергу і синхронізацію</h3><p>Залиш <strong>Demo sensor</strong> вибраним. Увімкни режим польоту на Android, перевір, що Wi‑Fi також вимкнено. Зміни поле <strong>Опис</strong> на <code>android-offline</code> і натисни <strong>Зберегти</strong>. Покажи час кешу й лічильник черги. Віднови мережу, натисни <strong>Синхронізувати</strong>. Покажи <strong>надіслано 1, відхилено 0</strong> і після повторного вибору пристрою звір опис.</p><div class="say"><span class="label">Сказати</span>Після втрати зв’язку клієнт читає список із локального SQLite та записує зміну в чергу. Коли мережа відновлюється, SyncEngine надсилає зміну. Повторне завантаження підтверджує, що опис є на сервері.</div></div></li>
+      <li class="step"><span class="time">4:15–5:15</span><div><h3>Відкрити свої PR і рев’ю</h3><p>На комп’ютері відкрий <a href="#contribution">ланцюг №92 → №112</a>. Клацни коміти, рев’ю Назара й merge. Потім покажи <a href="#reviews">власні рев’ю</a>, почни з №102.</p><div class="say"><span class="label">Сказати</span>У PR №112 я підключив офлайн-репозиторій до екрана і додав кнопку синхронізації. Назар перевірив відключення API та повторну синхронізацію. У чужому PR №102 я відтворив помилку, коли некоректний JSON давав 500 замість 400, а після виправлення повторно перевірив відповідь.</div></div></li>
+      <li class="step"><span class="time">5:15–6:00</span><div><h3>Підтвердити результат тестами</h3><p>Відкрий <a href="#tests">результати та покриття</a>. Покажи також <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/actions/runs/103">Forgejo Actions для ed8d284</a>.</p><div class="say"><span class="label">Сказати</span>На коміті ed8d284 пройшли 245 модульних і 110 інтеграційних тестів та 11 приймальних перевірок. Coverlet показав 96,2% покриття рядків для збірок, які перевіряли автотести. Під час демонстрації можна звірити, що офлайн-зміна дійшла до сервера.</div></div></li>
+    </ol>
+  </section>
+  <aside class="panel" aria-labelledby="ready">
+    <h2 id="ready">Підготуй до показу</h2>
+    <ul>
+      <li>Відкрий застосунок, цю сторінку й вкладку з <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/112">PR №112</a>.</li>
+      <li>Запусти API. В емуляторі вкажи <code>http://10.0.2.2:5000</code>, на телефоні в тій самій мережі — LAN-адресу комп’ютера й порт <code>5000</code>. Отримай свіжий тестовий токен і встав саме значення <code>token</code>. Перевір підключення до початку показу.</li>
+      <li>Створи <strong>Demo sensor</strong> з URL <code>http://127.0.0.1:5000</code>. Цю адресу використовує <em>сервер</em> для звернення до симулятора.</li>
+      <li>Додай правило <code>temperature</code>, мінімум <code>0</code>, максимум <code>40</code>. Запусти кілька звичайних вимірювань для графіка. Перевір, що черга порожня.</li>
+      <li>Для повтору офлайн-демо введи новий опис. Якщо режим польоту не відріже API в емуляторі, зупини демо-сервер і запусти його з тією самою БД на тому самому порту.</li>
+    </ul>
+    <p class="refs"><a href="#startup">Команди запуску</a> · <a href="#screens">Резервні скриншоти</a></p>
+  </aside>
+</div>
+<div class="wide wrap">
+<section id="evidence">
+<h2>Докази за критеріями</h2>
+<details class="details" id="contribution" open><summary><span class="criterion">B1 / D1</span> Мій внесок і ланцюг виконання</summary><div>
+<p><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/92">Issue №92</a> → гілка <code>feature/issue-92-offline-state-sync-app</code> → <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/112">PR №112</a> → коміти <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/commit/dd30c666">dd30c666</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/commit/6bd747da">6bd747da</a> → <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/112#issuecomment-1904">рев’ю Назара</a> → <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/commit/35f820d5fc8c719f25733f1e064e69b43652419b">merge в main</a>.</p>
+<p>У <code>MainViewModel</code> підключив <code>DeviceRepository</code> до завантаження й редагування пристроїв. Локальні зміни переживають закриття застосунку завдяки SQLite. <code>SyncEngine</code> повторює операції з черги, лишає невідправлені після втрати зв’язку та фіксує відхилення сервера.</p>
+<p><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/85">Типізований API-клієнт №85</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/89">Кеш і черга №89</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/96">Графіки №96</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/37">Інтеграційні тести №37</a></p>
+</div></details>
+<details class="details"><summary><span class="criterion">B2</span> Хто які задачі закрив</summary><div>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Командні задачі"><table><thead><tr><th>Учасник</th><th>Виконано</th><th>Приклади задач</th></tr></thead><tbody>
+<tr><td>Тарас</td><td>14 / 14</td><td>MAUI, HTTP тест, офлайн, графіки. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/92">№92</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/91">№91</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/86">№86</a></td></tr>
+<tr><td>Назар</td><td>21 / 21</td><td>API, модель даних, події. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/98">№98</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/95">№95</a></td></tr>
+<tr><td>Іван</td><td>16 / 16</td><td>Діагностика, валідація та воркери. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/103">№103</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/94">№94</a></td></tr>
+<tr><td>Денис</td><td>11 / 11</td><td>CI, SonarQube, приймальні перевірки й надійність. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/119">№119</a>, <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues/100">№100</a></td></tr>
+</tbody></table></div>
+<p class="refs muted">Спільні задачі враховано кожному виконавцю. Строки в полях задач відсутні, своєчасність слід підтвердити датами командних чекпоінтів. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/issues?state=closed">Закриті задачі</a></p>
+</div></details>
+<details class="details" id="reviews" open><summary><span class="criterion">B3</span> Чотири результативні рев’ю Тараса</summary><div><ul>
+<li><strong>№102.</strong> Некоректний JSON на .NET 10 повертав 500. Після виправлення відтворив сценарій і підтвердив 400. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/102#issuecomment-1698">Зауваження</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/102#issuecomment-1703">Перевірка</a></li>
+<li><strong>№33.</strong> Новий пристрій без вимірювань повертав 404 у статистиці. Перевірив підсумок 0 із 0. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/33#issuecomment-1222">Зауваження</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/33#issuecomment-1239">Перевірка</a></li>
+<li><strong>№28.</strong> Запит до пристрою міг зависнути. Запропонував таймаут і збереження збою у вимірюванні, після виправлення перевірив обидві дії. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/28#issuecomment-1195">Зауваження</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/28#issuecomment-1203">Перевірка</a></li>
+<li><strong>№16.</strong> Оновлення неіснуючого пристрою могло дати 500. Після виправлення підтвердив 404. <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/16#issuecomment-1120">Зауваження</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/16#issuecomment-1132">Перевірка</a></li>
+</ul></div></details>
+<details class="details" id="tests" open><summary><span class="criterion">C0–C4</span> Платформи, тести, крайні випадки й аналіз</summary><div>
+<p><strong>C0.</strong> Основний показ — Android. За пам’яткою живий показ однієї ОС дає 0,5 рівня C0, двох або більше — 1,0. Якщо команда має Windows, можна повторити короткий HTTP тест наживо.</p>
+<p><strong>C1.</strong> 11/11 приймальних перевірок у локальному прогоні для <code>ed8d284</code>. Перевірено доступ, валідацію, запис усіх п’яти сценаріїв симулятора, воркери та їхні журнали. <a href="evidence/acceptance.txt">Результат прогону</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/scripts/acceptance-run.sh">Сценарій тестів</a></p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="П’ять крайніх випадків"><table><thead><tr><th>C2 · Випадок</th><th>Як відтворити</th><th>Підтверджений результат</th></tr></thead><tbody>
+<tr><td>Валідація введення</td><td>Створити пристрій із порожньою назвою та URL <code>ftp://x</code>.</td><td>API відхиляє запит з HTTP 400.</td></tr>
+<tr><td>Некоректні дані</td><td>Виконати тест <code>simulator/invalid-json</code>.</td><td>Помилку JSON зафіксовано у діагностиці вимірювання.</td></tr>
+<tr><td>Виняток / таймаут</td><td>Виконати <code>simulator/timeout</code> із лімітом <code>1000</code> мс.</td><td>Таймаут записано як помилку вимірювання, API продовжує працювати.</td></tr>
+<tr><td>Межові значення</td><td>Задати інтервал моніторингу <code>4</code>, <code>5</code>, <code>86400</code> і <code>86401</code> с в інтеграційному тесті.</td><td>5 і 86400 прийнято, 4 та 86401 відхилено.</td></tr>
+<tr><td>Журнали прогону</td><td>Перевірити логи API і двох воркерів після приймального тесту.</td><td>Немає записів <code>fail:</code>, <code>crit:</code> і <code>Unhandled exception</code>.</td></tr>
+</tbody></table></div>
+<p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/tests/IoT.IntegrationTests/ValidationTests.cs">Тести граничних значень</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/tests/IoT.IntegrationTests/ApiTests.cs">Тести симулятора</a></p>
+<p>Відоме обмеження Android-клієнта на <code>ed8d284</code>. Під час підключення без дійсного токена HTTP 401 спричиняє закриття застосунку. Перезапусти його й встав свіжий токен.</p>
+<p><strong>C3.</strong> 245 unit + 110 integration, 0 збоїв. Coverlet / ReportGenerator — 96,2% рядків (2965 / 3082) і 91,1% гілок (1356 / 1487). Локальний прогін macOS, шість збірок без MAUI та згенерованих міграцій. У CI поріг покриття рядків 80%. <a href="evidence/tests.txt">Підсумок тестів</a> · <a href="evidence/coverage.txt">Підсумок інструмента</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/actions/runs/96">Зелений CI для PR №112</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/actions/runs/103">CI коміту ed8d284</a></p>
+<p><strong>C4.</strong> Є workflow SonarQube. На попередньому локальному прогоні для <code>39ac333</code> Quality Gate пройдено. У поточному <code>ed8d284</code> змерджено виправлення зауважень. Для оцінки щільності critical/major відкрий актуальну панель SonarQube. <a href="evidence/sonarqube.png">Попередній прогін</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/pulls/120">Виправлення SonarQube №120</a></p>
+</div></details>
+<details class="details"><summary><span class="criterion">C5</span> Цілісність даних</summary><div><ul>
+<li><strong>Нормалізація.</strong> Пристрої, правила, вимірювання та події в окремих таблицях. <code>DeviceStatuses</code> — денормалізована проєкція для швидкого читання.</li>
+<li><strong>Ключі та обмеження.</strong> FK зв’язують правила й вимірювання з пристроями. Є унікальна назва й перевірки меж.</li>
+<li><strong>Індекси.</strong> Історія шукається за <code>(DeviceId, Timestamp)</code>, події — за вимірюванням і станом підтвердження.</li>
+<li><strong>Параметризація.</strong> EF Core та параметри SQL у локальному SQLite-кеші.</li>
+<li><strong>Транзакції.</strong> Вимірювання, попередження та подія outbox записуються атомарно. У клієнті транзакції захищають оновлення кешу та злиття черги.</li>
+</ul><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/DATA_MODEL.md">Модель даних у репозиторії</a></p></div></details>
+<details class="details" id="startup" open><summary><span class="criterion">E3</span> Запуск із README</summary><div>
+<p>З кореня репозиторію запусти API. Використовуй тестовий токен тільки в локальному демо.</p>
+<pre><code>docker compose up --build</code></pre>
+<p>У другому терміналі отримай тестовий токен. Скопіюй значення <code>token</code> в поле застосунку.</p>
+<pre><code>curl -fsS -X POST http://localhost:5000/api/auth/token \
+  -H 'Content-Type: application/json' \
+  -d '{"user":"demo","role":"Admin","group":"default"}'</code></pre>
+<p>Збери Android APK і встанови на запущений емулятор. Потрібні .NET 10, MAUI, Android SDK, JDK і <code>adb</code>.</p>
+<pre><code>dotnet workload restore src/IoT.Mobile/IoT.Mobile.csproj
+dotnet build src/IoT.Mobile -f net10.0-android -p:EmbedAssembliesIntoApk=true
+adb install -r src/IoT.Mobile/bin/Debug/net10.0-android/com.companyname.iot.mobile-Signed.apk</code></pre>
+<p>Якщо .NET не знаходить JDK або Android SDK, передай шляхи до них через <code>-p:JavaSdkDirectory=…</code> і <code>-p:AndroidSdkDirectory=…</code>. Локальний запуск API без Docker описано в README.</p>
+<p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/README.md">README проєкту</a></p>
+</div></details>
+</section>
+<section id="screens">
+<h2>Резервні скриншоти</h2>
+<p class="muted">Екрани HTTP і графіка з попереднього Android-прогону. Натисни, щоб відкрити зображення у повному розмірі.</p>
+<div class="gallery">
+  <figure><a href="evidence/android-http.png"><img src="evidence/android-http.png" alt="HTTP 200 та JSON з нормальною температурою" loading="lazy"></a><figcaption>Звичайне вимірювання</figcaption></figure>
+  <figure><a href="evidence/android-anomaly.png"><img src="evidence/android-anomaly.png" alt="HTTP 200 і значення температури 150" loading="lazy"></a><figcaption>Температура поза межами</figcaption></figure>
+  <figure><a href="evidence/android-telemetry.png"><img src="evidence/android-telemetry.png" alt="Історія вимірювань, експорт CSV та графік з піками до 150" loading="lazy"></a><figcaption>Історія і графік температури</figcaption></figure>
+</div>
+</section>
+<section id="questions">
+<h2>Питання й мікрозміни</h2>
+<details class="details" open><summary><span class="criterion">E1</span> Три короткі відповіді</summary><div><dl>
+<dt>Де виконується HTTP-запит до пристрою?</dt><dd>На сервері, тому базова адреса пристрою має бути доступна саме серверу. Емулятор звертається до API через <code>10.0.2.2</code>.</dd>
+<dt>Що відбувається зі зміною після втрати зв’язку?</dt><dd>Клієнт записує її в SQLite, а після ручної синхронізації SyncEngine відправляє операції. Мережевий збій лишає невідправлені операції для повтору.</dd>
+<dt>Навіщо скорочувати кількість точок графіка?</dt><dd>Щоб телефон швидше малював довгу історію. LTTB вибирає точки за площею трикутників, зберігає хронологічний порядок і крайні точки ряду.</dd>
+</dl></div></details>
+<details class="details"><summary><span class="criterion">E2</span> Дві вправи на випадок зміни умови</summary><div><ol>
+<li><strong>Ліміт графіка 80 точок.</strong> У <code>src/IoT.Mobile/MainViewModel.cs</code> зміни <code>ChartPoints</code> зі 120 на 80. Перезбери клієнт і онови графік для історії з понад 80 коректними значеннями.</li>
+<li><strong>Таймаут за замовчуванням 2000 мс.</strong> У тому самому файлі зміни початкове <code>timeoutMs = "5000"</code> на <code>"2000"</code>. Перезапусти клієнт після збірки, перевір поле й виконай <code>simulator/timeout</code>.</li>
+</ol><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/src/commit/ed8d284e833fc748cfdaef893152cc31b54095f8/src/IoT.Mobile/MainViewModel.cs">MainViewModel.cs</a></p></div></details>
+</section>
+</div>
+</main>
+<footer class="wrap">Тарас Загорський · ІПЗ-31 · Перевірений код <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic-platform-review-demo/commit/ed8d284e833fc748cfdaef893152cc31b54095f8">ed8d284</a></footer>
+<script>
+const openLinkedDetails = () => {
+  const target = document.getElementById(location.hash.slice(1));
+  const details = target?.closest("details");
+  if (details) details.open = true;
+};
+addEventListener("hashchange", openLinkedDetails);
+openLinkedDetails();
+</script>
+</body>
+</html>
