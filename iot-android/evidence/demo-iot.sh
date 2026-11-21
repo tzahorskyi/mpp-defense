@@ -231,7 +231,11 @@ def main():
         if f"package:{PACKAGE}" in adb("shell", "pm", "list", "packages", PACKAGE).splitlines():
             if adb("shell", "pm", "clear", PACKAGE) != "Success":
                 raise RuntimeError("Не вдалося очистити дані застосунку в тимчасовій копії емулятора.")
-        adb("install", "--no-incremental", "-r", str(apk), timeout=150)
+        try:
+            adb("install", "--incremental", "-r", str(apk), timeout=55)
+        except subprocess.SubprocessError:
+            print("Повторю встановлення APK звичайним способом.")
+            adb("install", "--no-incremental", "-r", str(apk), timeout=240)
         component = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()[-1]
         if not component.startswith(PACKAGE + "/"):
             raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
