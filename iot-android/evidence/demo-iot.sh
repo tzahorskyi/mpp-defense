@@ -19,6 +19,7 @@ ROOT = "https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic"
 REMOTE_API = "https://git.cvv-sandbox.eu.cc/iot-diagnostic/"
 SCENARIO = "https://tzahorskyi.github.io/mpp-defense/iot-android/"
 REV = "7198faf5999718bc87c5e4a0b99be4c6899aee0d"
+API_ERROR_FIX = "d103caeeca98bf10dd196cdb36372d96df16e26a"
 PACKAGE = "com.companyname.iot.mobile"
 CACHE = Path.home() / "Library/Caches/mpp-iot-defense"
 STEPS = (
@@ -74,7 +75,7 @@ def prepare_source(supplied):
             subprocess.run(["git", "clone", "--quiet", ROOT + ".git", str(clone)], check=True, timeout=180)
             run("git", "-C", str(clone), "switch", "--quiet", "--detach", REV)
             clone.rename(source)
-    if run("git", "-C", str(source), "rev-parse", "HEAD") != REV:
+    if run("git", "-C", str(source), "rev-parse", "HEAD") not in {REV, API_ERROR_FIX}:
         raise RuntimeError(f"Для сценарію потрібен коміт {REV[:7]}. Обраний клон: {source}")
     if run("git", "-C", str(source), "status", "--porcelain", "--untracked-files=no"):
         raise RuntimeError(f"У клоні є локальні правки. Для цього запуску потрібен чистий клон: {source}")
