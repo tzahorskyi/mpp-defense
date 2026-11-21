@@ -1,13 +1,13 @@
 Summary
-  Generated on: 21.11.2026 - 14:23:13
-  Coverage date: 21.11.2026 - 14:22:16 - 21.11.2026 - 14:22:39
+  Generated on: 21.11.2026 - 14:54:51
+  Coverage date: 21.11.2026 - 14:49:59 - 21.11.2026 - 14:50:15
   Parser: MultiReport (2x Cobertura)
   Assemblies: 6
   Classes: 112
   Files: 47
-  Line coverage: 96.3%
-  Covered lines: 2969
-  Uncovered lines: 113
+  Line coverage: 96.2%
+  Covered lines: 2965
+  Uncovered lines: 117
   Coverable lines: 3082
   Total lines: 4842
   Branch coverage: 91.2% (1357 of 1487)
