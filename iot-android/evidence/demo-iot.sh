@@ -30,7 +30,8 @@ def wait_for(label, read, timeout):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         try:
-            if result := read():
+            result = read()
+            if result is not None and result is not False:
                 return result
         except (subprocess.SubprocessError, URLError, ET.ParseError, ValueError):
             pass
@@ -116,7 +117,8 @@ def connect_android(adb, address, token):
 
     def address_entry():
         screen = nodes()
-        if prompt := next((n for n in screen if n.get("text") == "Wait"), None):
+        prompt = next((n for n in screen if n.get("text") == "Wait"), None)
+        if prompt is not None:
             tap(prompt)
             return None
         return next((n for n in screen
