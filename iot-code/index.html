@@ -1,0 +1,131 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Тарас Загорський · захист IoT Diagnostic Platform</title><style>
+:root{color-scheme:light;--paper:#f6f3ea;--ink:#222821;--muted:#546052;--green:#22583d;--line:#cbd0bc}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.62 ui-serif,Georgia,serif}a{color:var(--green);text-underline-offset:.21em}a:focus-visible,summary:focus-visible{outline:2px solid var(--green);outline-offset:4px}main{max-width:1120px;margin:auto;padding:32px 28px 72px}header{border-bottom:2px solid var(--green);padding-bottom:22px}h1{font-size:clamp(2rem,5vw,3.7rem);letter-spacing:-.045em;line-height:1.05;margin:.16em 0}header p,.refs,nav{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.89rem}header p{color:var(--muted)}.layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:34px}nav{position:sticky;top:20px;align-self:start;padding-top:22px}nav a{display:block;padding:5px 0}section{padding:25px 0;border-bottom:1px solid var(--line);scroll-margin-top:20px}h2{font-size:1.65rem;line-height:1.2;margin:.3rem 0 .9rem}p{margin:.7rem 0}blockquote{margin:14px 0;padding:10px 15px;border-left:3px solid var(--green);background:#e9eddf}details{border:1px solid var(--line);padding:7px 11px;margin:8px 0}summary{cursor:pointer;font-family:ui-monospace,monospace;font-size:.82rem;overflow-wrap:anywhere}pre{overflow:auto;background:#232e26;color:#f5f6eb;padding:13px;font-size:.79rem}code,kbd{font-family:ui-monospace,monospace;font-size:.83em;overflow-wrap:anywhere}.review li{margin:.5em 0}.review p{margin:.1em 0}@media(max-width:730px){main{padding:20px 16px 48px}.layout{display:block}nav{position:static;border-bottom:1px solid var(--line);padding-bottom:14px}}@media print{nav{display:none}.layout{display:block}section{break-inside:avoid}}
+</style></head><body><main><header><p>Тарас Загорський · ІПЗ-31</p><h1>Захист IoT Diagnostic Platform</h1><p>Особистий сценарій · код, PR і Actions</p><p>У VS Code <kbd>⌘P</kbd> відкриває файл, <kbd>⌃G</kbd> переходить до рядка. Рядки наведені для локальної macOS-гілки <code>e5094d9</code>, посилання Forgejo показують командну історію.</p></header><div class="layout"><nav aria-label="Зміст"><a href="#start">Запуск клієнта і XAML</a><a href="#connection">API, авторизація і винятки</a><a href="#diagnostics">HTTP-тест і телеметрія</a><a href="#offline">SQLite, черга та синхронізація</a><a href="#history">Мій внесок у Git · B1 / B2 / B3</a><a href="#actions">Actions, тести і SonarQube · C1–C4</a><a href="#demo">Коротка демонстрація після коду</a><a href="#rubric">Резерв за методичкою · A, C5, E1–E2</a></nav><article><section id="start"><h2>Запуск клієнта і XAML</h2><p class="cue"><strong>Покажи.</strong> У VS Code натисни <kbd>⌘P</kbd> → <code>IoT.Mobile.csproj</code>. Покажи цілі збірки. Потім <code>App.xaml.cs</code> → <code>MainPage.xaml.cs</code> → <code>MainPage.xaml</code>, рядки 24–27 та 43–52.</p><blockquote><strong>Скажи.</strong> Я Тарас Загорський. Моя зона — клієнт .NET MAUI: інтерфейс, підключення до API, діагностика, офлайн-зміни та синхронізація. App спочатку завантажує ресурси, потім CreateWindow отримує MainPage з DI. MainPage призначає ViewModel через BindingContext. XAML прив’язує стан і команди до цього об’єкта. DataTrigger приховує порожній статус, а кнопка синхронізації викликає SyncCommand.</blockquote><details><summary>src/IoT.Mobile/IoT.Mobile.csproj · 3–9</summary><pre>  3  	&lt;PropertyGroup&gt;
+  4  		&lt;TargetFrameworks&gt;net10.0-android&lt;/TargetFrameworks&gt;
+  5  		&lt;TargetFrameworks Condition=&quot;$([MSBuild]::IsOSPlatform(&#x27;windows&#x27;))&quot;&gt;$(TargetFrameworks);net10.0-windows10.0.19041.0&lt;/TargetFrameworks&gt;
+  6
+  7  		&lt;TargetFrameworks Condition=&quot;&#x27;$(BuildMacCatalyst)&#x27; == &#x27;true&#x27; And $([MSBuild]::IsOSPlatform(&#x27;osx&#x27;))&quot;&gt;net10.0-maccatalyst&lt;/TargetFrameworks&gt;
+  8
+  9  		&lt;!-- Note for MacCatalyst:</pre></details><details><summary>src/IoT.Mobile/App.xaml.cs · 4–8</summary><pre>  4      private readonly IServiceProvider services;
+  5
+  6      // The page is resolved after InitializeComponent so its StaticResources can find the app palette.
+  7      public App(IServiceProvider services) { InitializeComponent(); this.services = services; }
+  8      protected override Window CreateWindow(IActivationState? activationState) =&gt; new(new NavigationPage(services.GetRequiredService&lt;MainPage&gt;()));</pre></details><details><summary>src/IoT.Mobile/MainPage.xaml.cs · 2–5</summary><pre>  2  public partial class MainPage : ContentPage
+  3  {
+  4      public MainPage(MainViewModel vm) { InitializeComponent(); BindingContext = vm; }
+  5  }</pre></details><details><summary>src/IoT.Mobile/MainPage.xaml · 43–52</summary><pre> 43                      &lt;Label Text=&quot;Токен доступу&quot; Style=&quot;{StaticResource FieldLabel}&quot; /&gt;
+ 44                      &lt;Entry Text=&quot;{Binding AccessToken}&quot; Placeholder=&quot;Bearer токен&quot; IsPassword=&quot;True&quot; /&gt;
+ 45                      &lt;Button Text=&quot;Підключити / оновити&quot; Command=&quot;{Binding RefreshCommand}&quot; /&gt;
+ 46                      &lt;Border Style=&quot;{StaticResource InfoStrip}&quot;&gt;
+ 47                          &lt;Border.Triggers&gt;
+ 48                              &lt;DataTrigger TargetType=&quot;Border&quot; Binding=&quot;{Binding OfflineStatus}&quot; Value=&quot;&quot;&gt;&lt;Setter Property=&quot;IsVisible&quot; Value=&quot;False&quot; /&gt;&lt;/DataTrigger&gt;
+ 49                          &lt;/Border.Triggers&gt;
+ 50                          &lt;Label Text=&quot;{Binding OfflineStatus}&quot; TextColor=&quot;{StaticResource Accent}&quot; FontSize=&quot;13&quot; /&gt;
+ 51                      &lt;/Border&gt;
+ 52                      &lt;Button Text=&quot;Синхронізувати&quot; Style=&quot;{StaticResource OutlineButton}&quot; Command=&quot;{Binding SyncCommand}&quot; /&gt;</pre></details><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/122/files">PR №122 · редизайн</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues/123">Issue №123 · збій ресурсів</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/124/files">PR №124 · порядок ініціалізації</a></p></section><section id="connection"><h2>API, авторизація і винятки</h2><p class="cue"><strong>Покажи.</strong> Відкрий <code>MainViewModel.cs</code>, рядки 78–126. Покажи <code>ApplyAccessToken</code>, <code>Run</code>, <code>Refresh</code> і <code>Repository</code>. У <code>IoTApiClient.cs</code> знайди <code>GetDevicesAsync</code>.</p><blockquote><strong>Скажи.</strong> Токен зберігається в SecureStorage, а адреса в Preferences. Refresh перевіряє URL, застосовує Bearer і просить репозиторій завантажити пристрої. Repository прив’язує HttpClient до URL і передає заголовок авторизації. Типізований клієнт десеріалізує список і має політику повторів для ідемпотентних запитів. Run ставить Busy, показує очікувану помилку в Status і скидає Busy у finally. У моїй локальній гілці ApiException також обробляється тут. На Android перевірено, що після HTTP 409 вікно лишається відкритим.</blockquote><details><summary>src/IoT.Mobile/MainViewModel.cs · 78–108</summary><pre> 78      {
+ 79          // The token is kept in platform secure storage, never in plain preferences.
+ 80          if (string.IsNullOrWhiteSpace(AccessToken))
+ 81              AccessToken = await SecureStorage.Default.GetAsync(&quot;access-token&quot;) ?? &quot;&quot;;
+ 82          else
+ 83              await SecureStorage.Default.SetAsync(&quot;access-token&quot;, AccessToken.Trim());
+ 84          client.DefaultRequestHeaders.Authorization = string.IsNullOrWhiteSpace(AccessToken)
+ 85              ? null
+ 86              : new System.Net.Http.Headers.AuthenticationHeaderValue(&quot;Bearer&quot;, AccessToken.Trim());
+ 87      }
+ 88      private static string DefaultServerUrl()
+ 89      {
+ 90          if (DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+ 91              return &quot;https://git.cvv-sandbox.eu.cc/iot-diagnostic/&quot;;
+ 92
+ 93          return DeviceInfo.Platform == DevicePlatform.Android ? &quot;http://10.0.2.2:5000&quot; : &quot;http://localhost:5000&quot;;
+ 94      }
+ 95      private string Url(string path) =&gt; ServerUrl.TrimEnd(&#x27;/&#x27;) + &quot;/&quot; + path.TrimStart(&#x27;/&#x27;);
+ 96      private async Task Run(Func&lt;Task&gt; action) { if (Busy) return; Busy = true; try { Status = &quot;&quot;; await action(); } catch (Exception e) when (e is ApiException or HttpRequestException or TaskCanceledException or JsonException or ArgumentException or InvalidOperationException or FormatException) { Status = e.Message; } finally { Busy = false; } }
+ 97      private async Task Refresh()
+ 98      {
+ 99          if (!Uri.TryCreate(ServerUrl, UriKind.Absolute, out var url) || url.Scheme is not (&quot;http&quot; or &quot;https&quot;)) throw new ArgumentException(&quot;Вкажіть коректну HTTP(S) адресу сервера.&quot;);
+100          Preferences.Default.Set(&quot;server&quot;, ServerUrl);
+101          await ApplyAccessToken();
+102          var list = await (await Repository()).LoadAsync();
+103          Devices.Clear();
+104          foreach (var local in list.Devices) Devices.Add(local.Device);
+105          OfflineStatus = list.FromCache
+106              ? $&quot;Офлайн: дані з кешу від {list.CachedAt?.ToLocalTime():g}. Змін у черзі: {list.PendingChanges}&quot;
+107              : list.PendingChanges &gt; 0 ? $&quot;Змін у черзі: {list.PendingChanges}. Натисніть «Синхронізувати».&quot; : &quot;&quot;;
+108          Status = $&quot;Завантажено пристроїв: {list.Devices.Count}&quot;;</pre></details><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/85/files">PR №85 · типізований клієнт і повтори</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/49/files">PR №49 · CRUD</a></p></section><section id="diagnostics"><h2>HTTP-тест і телеметрія</h2><p class="cue"><strong>Покажи.</strong> У <code>MainPage.xaml</code> перейди до рядка 105. Потім у <code>MainViewModel.cs</code> відкрий <code>Send</code> (153) і <code>LoadTelemetry</code> (211). Покажи <code>ChartData.Downsample</code> від рядка 16.</p><blockquote><strong>Скажи.</strong> Кнопка бере метод, шлях, тіло запиту і таймаут від 100 до 60000 мс. ViewModel надсилає специфікацію в /api/devices/{id}/requests, а HTTP-запит до пристрою виконує бекенд. Два окремі результати — HTTP-статус і діагностичне правило. Симулятор може повернути 200 з температурою 150, і значення вийде за межі 0–40. Для графіка клієнт обмежує кількість точок до 120 через LTTB, а мінімум і максимум бере з відповіді сервера.</blockquote><details><summary>src/IoT.Mobile/MainViewModel.cs · 211–225</summary><pre>211      private async Task LoadTelemetry()
+212      {
+213          if (string.IsNullOrWhiteSpace(TelemetryPath))
+214              throw new ArgumentException(&quot;Вкажіть JSON шлях показника.&quot;);
+215
+216          var field = Uri.EscapeDataString(TelemetryPath);
+217          var data = await client.GetFromJsonAsync&lt;TelemetryData&gt;(Url($&quot;api/devices/{Id()}/telemetry?field={field}&quot;))
+218              ?? throw new JsonException(&quot;Порожня відповідь аналітики.&quot;);
+219          var points = ChartData.Downsample(data.Points.Select(point =&gt; new ChartPoint(point.Timestamp, point.Value)).ToList(), ChartPoints);
+220          Series = [new LineSeries&lt;double&gt; { Values = points.Select(point =&gt; point.Value).ToArray(), Name = data.Field }];
+221          OnPropertyChanged(nameof(Series));
+222          TelemetrySummary = data.Points.Count == 0
+223              ? $&quot;Немає числових даних. Пропущено: {data.Skipped}/{data.Examined}&quot;
+224              : $&quot;Мін: {data.Minimum:F2}; макс: {data.Maximum:F2}; середнє: {data.Average:F2}. Пропущено: {data.Skipped}/{data.Examined}&quot;;
+225      }</pre></details><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/52/files">PR №52 · редактор запиту</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/51/files">PR №51 · відповідь і тривалість</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/96/files">PR №96 · графік</a></p></section><section id="offline"><h2>SQLite, черга та синхронізація</h2><p class="cue"><strong>Покажи.</strong> Відкрий <code>DeviceRepository.cs</code>, рядки 74–113 → <code>SyncEngine.cs</code>, рядки 32–83 → <code>MainViewModel.cs</code>, рядок 128. Потім <code>OfflineSyncTests.cs</code>, рядки 67–81.</p><blockquote><strong>Скажи.</strong> LoadAsync у мережі оновлює кеш. При втраті зв’язку бере збережений список і накладає на нього чергу через PendingOverlay. SaveAsync відправляє зміну або записує її в чергу при тимчасовій помилці. SyncEngine відправляє операції по порядку, зберігає постійно відхилену зміну в журналі і зупиняється на тимчасовому збої. У тесті перша операція встигає пройти, а друга після обриву лишається в черзі з лічильником спроб. Після відновлення мережі її можна повторити.</blockquote><details><summary>src/IoT.Client/Offline/DeviceRepository.cs · 74–89</summary><pre> 74      public async Task&lt;DeviceList&gt; LoadAsync(CancellationToken ct = default)
+ 75      {
+ 76          var pending = await store.GetPendingAsync(ct);
+ 77          try
+ 78          {
+ 79              var devices = await api.GetDevicesAsync(ct);
+ 80              await store.ReplaceDevicesAsync(devices, ct);
+ 81              return new DeviceList(PendingOverlay.Apply(devices, pending), false, null, pending.Count);
+ 82          }
+ 83          catch (Exception e) when (IoTApiClient.IsOffline(e))
+ 84          {
+ 85              var cached = await store.GetDevicesAsync(ct);
+ 86              return new DeviceList(PendingOverlay.Apply(cached, pending), true, await store.GetLastSyncAsync(ct), pending.Count);
+ 87          }
+ 88      }
+ 89  </pre></details><details><summary>src/IoT.Client/Offline/SyncEngine.cs · 50–83</summary><pre> 50      private async Task&lt;(int Sent, int Rejected, string? Interruption)&gt; PushAsync(CancellationToken ct)
+ 51      {
+ 52          int sent = 0, rejected = 0;
+ 53          var assigned = new Dictionary&lt;int, int&gt;();
+ 54          foreach (var queued in await store.GetPendingAsync(ct))
+ 55          {
+ 56              var operation = assigned.TryGetValue(queued.DeviceId, out var serverId) ? queued with { DeviceId = serverId } : queued;
+ 57              try
+ 58              {
+ 59                  if (await ApplyAsync(operation, ct) is { } created)
+ 60                  {
+ 61                      assigned[operation.DeviceId] = created;
+ 62                      await store.RemapDeviceAsync(operation.DeviceId, created, ct);
+ 63                  }
+ 64
+ 65                  await store.CompleteAsync(operation.Sequence, ct);
+ 66                  sent++;
+ 67              }
+ 68              catch (ApiException e) when (e.IsPermanent)
+ 69              {
+ 70                  await store.FailAsync(operation.Sequence, e.Message, ct);
+ 71                  rejected++;
+ 72              }
+ 73              catch (Exception e) when (e is ApiException || IoTApiClient.IsOffline(e))
+ 74              {
+ 75                  await store.RecordAttemptAsync(operation.Sequence, e.Message, ct);
+ 76                  return (sent, rejected, e.Message);
+ 77              }
+ 78          }
+ 79
+ 80          return (sent, rejected, null);
+ 81      }
+ 82
+ 83      /// &lt;summary&gt;Sends one change; returns the server id when it created a device.&lt;/summary&gt;</pre></details><details><summary>tests/IoT.UnitTests/OfflineSyncTests.cs · 67–81</summary><pre> 67      [Fact]
+ 68      public async Task LosingTheConnectionStopsAndKeepsTheRest()
+ 69      {
+ 70          await store.EnqueueAsync(OperationKind.UpdateDevice, 1, payload: Device(1, &quot;A&quot;));
+ 71          await store.EnqueueAsync(OperationKind.UpdateDevice, 2, payload: Device(2, &quot;B&quot;));
+ 72          server.Reply(HttpStatusCode.OK, &quot;{\&quot;id\&quot;:1,\&quot;name\&quot;:\&quot;A\&quot;,\&quot;baseUrl\&quot;:\&quot;http://a\&quot;}&quot;)
+ 73              .Fail(new HttpRequestException(&quot;network unreachable&quot;));
+ 74
+ 75          var report = await new SyncEngine(api, store).SyncAsync();
+ 76
+ 77          Assert.False(report.Completed);
+ 78          Assert.Equal(&quot;network unreachable&quot;, report.Interruption);
+ 79          var left = Assert.Single(await store.GetPendingAsync());
+ 80          Assert.Equal((2, 1), (left.DeviceId, left.Attempts));
+ 81      }</pre></details><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/89/files">PR №89 · SQLite-кеш і черга</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/112/files">PR №112 · підключення офлайн до UI</a></p></section><section id="history"><h2>Мій внесок у Git · B1 / B2 / B3</h2><p class="cue"><strong>Покажи.</strong> Відкрий issue №92 → PR №112. У заголовку покажи гілку й ціль <code>main</code>. Далі <strong>Commits</strong> → <strong>Files Changed</strong> → <strong>Conversation</strong> з рев’ю → запис merge. Для B2 покажи командну таблицю з погодженими строками, датами закриття і повідомленнями про ризики.</p><blockquote><strong>Скажи.</strong> У №112 я під’єднав офлайн-репозиторій до MAUI, додав стан кешу, лічильник черги та команду синхронізації. У комітах видно Refs #92. Рев’юер перевірив зміну перед merge. Для мого рев’ю покажу три приклади, в яких автор вніс правку, а я повторно перевірив результат.</blockquote><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues/92">Issue №92</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/112">PR №112 · гілка, рев’ю, merge</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/112/commits">Коміти з Refs #92</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/112/files">Diff</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/commit/35f820d5fc8c719f25733f1e064e69b43652419b">Merge 35f820d</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues?state=closed">Закриті задачі</a></p><ul class="review"><li><strong>№102 · Некоректний JSON · 500 → 400</strong> <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/102#issuecomment-1698">Мій коментар</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/commit/8dd8fe7fdf96602ba945499506914aa2b3f7dcea">Правка автора</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/102#issuecomment-1703">Повторна перевірка</a></p></li><li><strong>№33 · Статистика нового пристрою · 404 → 0 із 0</strong> <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/33#issuecomment-1222">Мій коментар</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/commit/90f0852aa9b5db81a69360cc96dcfa5a214056a4">Правка автора</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/33#issuecomment-1239">Повторна перевірка</a></p></li><li><strong>№28 · Таймаут · обмеження часу та запис збою</strong> <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/28#issuecomment-1195">Мій коментар</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/commit/b29972e301608cbf3ff3282f1bf67d2cf4ad079b">Правка автора</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/28#issuecomment-1203">Повторна перевірка</a></p></li></ul></section><section id="actions"><h2>Actions, тести і SonarQube · C1–C4</h2><p class="cue"><strong>Покажи.</strong> Відкрий IoT validation №61 → <strong>linux-validation</strong>. Розгорни <strong>Unit tests and coverage</strong>, <strong>Integration tests and coverage</strong>, <strong>Enforce coverage threshold</strong>, <strong>Acceptance run with two worker nodes</strong> і <strong>Android build</strong>. Далі SonarQube №62 → <strong>analysis</strong> → <strong>Analyze backend and import coverage</strong>. У SonarQube відкрий Issues і Lines of Code для C4.</p><blockquote><strong>Скажи.</strong> На коміті 7198faf локальний звіт зафіксував 245 модульних і 110 інтеграційних тестів та 96,2% покриття рядків у протестованих збірках. Це метрика звіту Coverlet на цьому коміті. Android збирається окремим кроком. Приймальний запуск дав 11 із 11 у наявному звіті. CI-лог показує, що SonarQube виконався, а рівень C4 рахуємо за кількістю critical і major на 1000 рядків.</blockquote><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/actions/runs/61">IoT validation №61</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/actions/runs/62">SonarQube №62</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf/.forgejo/workflows/ci.yml">YAML пайплайна</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/37">Мій PR №37 · інтеграційні тести</a></p><p class="refs"><a href="https://tzahorskyi.github.io/mpp-defense/iot-android/evidence/coverage.txt">Звіт покриття</a> · <a href="https://tzahorskyi.github.io/mpp-defense/iot-android/evidence/acceptance.txt">Приймальний звіт</a></p></section><section id="demo"><h2>Коротка демонстрація після коду</h2><p class="cue"><strong>Покажи.</strong> Перемкнися у <strong>IoT Diagnostics</strong> на macOS. Під’єднайся до <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code> командним токеном і вибери <strong>Demo sensor</strong>. Запусти <code>GET simulator/normal</code>, покажи 200 і температуру. Далі <code>simulator/out-of-range</code>, покажи 150 і попередження. За потреби покажи цей самий крок на другій ОС.</p><blockquote><strong>Скажи.</strong> Це той самий шлях, який я показав у коді. macOS-клієнт збирається через Mac Catalyst у локальній гілці e5094d9 з адресою спільного сервера за замовчуванням. Збірка macOS відкрилася, підключення перевіряю під час показу. Для C0 викладач зараховує операційні системи, показані наживо. Для E3 відкриваю README з офіційними командами запуску проєкту.</blockquote><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf/README.md">README для E3</a></p></section><section id="rubric"><h2>Резерв за методичкою · A, C5, E1–E2</h2><p class="cue"><strong>Покажи.</strong> <strong>A1/A3:</strong> відкрий свої повідомлення двох зрізів та issue, створені за зауваженнями. <strong>A2:</strong> підготуй змістовні коміти за тижнями, зв’язки з issue, README, п’ять рішень і приклад merge. <strong>C5:</strong> відкрий схему БД і покажи зв’язки, обмеження, індекси, параметризовані запити й транзакції.</p><blockquote><strong>Скажи.</strong> У моїй зоні найскладніша частина — зберегти зміну при обриві мережі та доставити її без втрати після повторного підключення. Це видно в DeviceRepository, SyncEngine, тесті перерваної синхронізації та відповідному PR.</blockquote><ul><li><strong>C2.</strong> Підготуй докази для п’яти пунктів: невалідний URL, порожні вимірювання, конфлікт HTTP 409 без падіння, межі таймауту 100/60000 та лог саме показаного прогону.</li><li><strong>E1.</strong> Що відбувається після Save без мережі? Чим кеш відрізняється від черги? Чому HTTP 200 може створити попередження?</li><li><strong>E2.</strong> Потренуй дві зміни: змінити таймаут за замовчуванням з 5000 до 3000 і ліміт точок графіка зі 120 до 80. Покажи, де задається кожне значення і як перевірити результат.</li></ul><p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/commits/branch/main">Історія main</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/src/commit/7198faf/src/IoT.Infrastructure">Схема й міграції</a></p></section></article></div></main></body></html>
