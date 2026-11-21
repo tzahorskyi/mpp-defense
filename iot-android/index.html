@@ -41,12 +41,22 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <div class="panel" id="auto-start">
 <p><strong>На своєму Mac відкрий Terminal і виконай одну команду.</strong></p>
 <pre><code>cd ~/Desktop/unik/MPP &amp;&amp; ./demo-iot.sh</code></pre>
-<p>Скрипт відкриє <strong>mpp_phone</strong>, збере й запустить IoT Diagnostics, запустить API, підставить адресу й тестовий токен. У застосунку буде вибрано <strong>Demo sensor</strong> з правилом <code>temperature</code> <code>0–40</code> і двома вимірюваннями. Також відкриються файли у VS Code та вкладки Forgejo.</p>
-<p>Дочекайся в терміналі <strong>«Готово. Android … · Demo sensor вибрано»</strong>. Перша збірка може зайняти кілька хвилин. Порт буде вказано в терміналі. Залиш це вікно відкритим до кінця показу.</p>
-<p>Для кожного запуску скрипт створює окремі дані Android і SQLite. Після показу натисни <kbd>Ctrl+C</kbd> у терміналі скрипта.</p>
+<p>Скрипт перевірить спільний API, збере й відкриє <strong>IoT Diagnostics</strong> у <strong>mpp_phone</strong> та підготує вкладки VS Code і Forgejo. Перша збірка може зайняти кілька хвилин.</p>
+<p>Працюй у порядку нижче. У терміналі <kbd>Enter</kbd> переходить до наступного кроку, <kbd>o</kbd> + <kbd>Enter</kbd> відкриває його на цій сторінці, <kbd>b</kbd> + <kbd>Enter</kbd> повертає назад. <kbd>q</kbd> + <kbd>Enter</kbd> завершує підказки. Залиш термінал відкритим до кінця показу.</p>
+<p>Коли Android уже відкритий, запусти тільки підказки командою <code>./demo-iot.sh --guide</code>.</p>
 <p>Якщо скрипт завантажено у Downloads, виконай <code>bash ~/Downloads/demo-iot.sh</code>.</p>
-<p class="refs"><a href="evidence/demo-iot.sh" download>Завантажити demo-iot.sh</a> · <a href="#startup">Ручний запуск за README для E3</a> · <a href="#emulator">Перейти до дій в Android</a> · <a href="#methodology">Критерії PDF</a></p>
+<p class="refs"><a href="evidence/demo-iot.sh" download>Завантажити demo-iot.sh</a> · <a href="#startup">Команди з README для E3</a> · <a href="#emulator">Перейти до дій в Android</a> · <a href="#methodology">Критерії PDF</a></p>
 </div>
+</section>
+<section id="android-connect">
+<h2>Крок 01 · підключення до спільного API</h2>
+<ol class="actions">
+<li>В Android відкрий <strong>IoT Diagnostics</strong>. У «Адреса сервера» встав <code>https://git.cvv-sandbox.eu.cc/iot-diagnostic/</code>.</li>
+<li>У «Токен доступу» встав виданий командою токен до поширення екрана. Натисни <strong>Підключити / оновити</strong> і дочекайся списку.</li>
+<li>Вибери свій демонстраційний пристрій. Для HTTP-тестів підготуй пристрій із симулятором, правилом <code>temperature</code> <code>0–40</code> і двома звичайними вимірюваннями. Перевір, що черга порожня. Повернися в Terminal і натисни <kbd>Enter</kbd>.</li>
+</ol>
+<p class="caption-note">На скриншотах попередньої репетиції показано локальну адресу. Для цього показу використовуй спільний HTTPS-ендпоінт вище.</p>
+<nav aria-label="Кроки скрипта"><ol class="jump-grid"><li><a href="#android-connect">01 · Підключення до API</a></li><li><a href="#opening">02 · Вступ</a></li><li><a href="#architecture">03 · Код і редизайн</a></li><li><a href="#devices">04 · Пристрої</a></li><li><a href="#http">05 · HTTP-тест</a></li><li><a href="#alerts">06 · Аномалія і графік</a></li><li><a href="#offline">07 · Офлайн</a></li><li><a href="#sync">08 · Синхронізація</a></li><li><a href="#git-proof">09 · Forgejo і мій внесок</a></li><li><a href="#actions">10 · Тести, Actions і підсумок</a></li></ol></nav>
 </section>
 <section class="scene" id="opening" data-scene>
 <header class="scene-head"><p class="time">0:00–0:45</p><h2>Вступ · що я зробив</h2></header>
@@ -131,12 +141,12 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 <section class="scene" id="devices" data-scene>
 <header class="scene-head"><p class="time">2:45–4:00</p><h2>Пристрої · підключення, створення, редагування</h2></header>
 <div class="phone-scene"><div><ol class="actions">
-<li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> → <strong>Demo sensor</strong>.</li>
-<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL із картки <strong>Demo sensor</strong> (той самий порт, який вказав скрипт) і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
+<li>У картці <strong>Підключення</strong> натисни <strong>Підключити / оновити</strong>. Дочекайся «Завантажено пристроїв». Натисни <strong>Оберіть пристрій</strong> і вибери свій демонстраційний пристрій (на скриншотах він називається <strong>Demo sensor</strong>).</li>
+<li>Для показу створення введи в поле <strong>Назва</strong> окрему назву <code>Demo CRUD</code>, URL симулятора з картки свого демонстраційного пристрою і опис <code>Перша версія</code>. Прокрути нижче, натисни <strong>Створити</strong> і вибери новий запис у списку.</li>
 <li>Зміни опис на <code>Оновлено в Android</code> → натисни <strong>Зберегти</strong> → обери <strong>Demo CRUD</strong> повторно. Покажи нове значення.</li>
 <li>Якщо потрібно показати видалення, натисни <strong>Видалити</strong> саме для <strong>Demo CRUD</strong>. Повернися до <strong>Demo sensor</strong> із підготовленим правилом та історією.</li>
 </ol>
-<blockquote class="line">Емулятор звертається до API на Mac через 10.0.2.2. Адреса пристрою, яку вводжу в картці, потрібна серверу для запиту до симулятора. Створення й редагування йдуть через один метод репозиторію. За ідентифікатором він визначає, чи створити пристрій, чи оновити існуючий.</blockquote></div><figure class="annotated"><a href="evidence/android-devices.png"><img src="evidence/android-devices.png" width="1040" height="1578" loading="lazy" alt="Картка пристрою та дії створення, збереження й видалення"><span class="pin" aria-hidden="true" style="--x:90.2%;--y:13.2%">1</span><span class="pin" aria-hidden="true" style="--x:30.8%;--y:88.4%">2</span><span class="pin" aria-hidden="true" style="--x:60.5%;--y:88.4%">3</span><span class="pin" aria-hidden="true" style="--x:90.2%;--y:88.4%">4</span></a><figcaption>Картка пристрою та дії створення, збереження й видалення</figcaption></figure></div>
+<blockquote class="line">Емулятор звертається до спільного API через HTTPS. Адреса пристрою, яку вводжу в картці, потрібна серверу для запиту до симулятора. Створення й редагування йдуть через один метод репозиторію. За ідентифікатором він визначає, чи створити пристрій, чи оновити існуючий.</blockquote></div><figure class="annotated"><a href="evidence/android-devices.png"><img src="evidence/android-devices.png" width="1040" height="1578" loading="lazy" alt="Картка пристрою та дії створення, збереження й видалення"><span class="pin" aria-hidden="true" style="--x:90.2%;--y:13.2%">1</span><span class="pin" aria-hidden="true" style="--x:30.8%;--y:88.4%">2</span><span class="pin" aria-hidden="true" style="--x:60.5%;--y:88.4%">3</span><span class="pin" aria-hidden="true" style="--x:90.2%;--y:88.4%">4</span></a><figcaption>Картка пристрою та дії створення, збереження й видалення</figcaption></figure></div>
 <p class="cue"><strong>У коді.</strong> Покажи, як <code>Update()</code> додає ID вибраного запису, а <code>SaveAsync()</code> обирає створення чи оновлення.</p>
 <details class="details snippet"><summary>Дії зі списком і вибраним пристроєм <span class="filepath">MainViewModel.cs · 142–145</span></summary><div><pre><code>    private int Id() =&gt; SelectedDevice?.Id ?? throw new InvalidOperationException(&quot;Оберіть пристрій.&quot;);
     private async Task Create() { var saved = await (await Repository()).SaveAsync(Input()); await Refresh(); ReportSaved(saved); }
@@ -421,7 +431,7 @@ main.wrap{padding-top:1.75rem}section,.details{scroll-margin-top:4rem}main>secti
 </section>
 <section id="startup">
 <h2>E3 · запуск з нуля за README</h2><p class="cue"><strong>Покажи.</strong> Відкрий README і звір команди в терміналі. Критерій перевіряє, чи може інша людина повторити запуск за інструкцією в межах часу.</p>
-<p><a href="#auto-start">Швидкий автоматичний запуск на Mac</a>. Нижче — ручний шлях і порти з README для перевірки E3.</p>
+<p><a href="#auto-start">Покроковий запуск зі спільним API</a>. Нижче наведено команди локального запуску з README для перевірки E3.</p>
 <div class="panel" id="startup-note">
 <p><strong>Збірка для показу — 7198faf.</strong> Виправлення запуску вже в <code>main</code>. У <code>App</code> спочатку виконується <code>InitializeComponent()</code>, а <code>MainPage</code> створюється в <code>CreateWindow()</code>. Ресурси теми вже завантажені, коли сторінка читає <code>StaticResource Primary</code>.</p>
 <p class="refs"><a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/issues/123">Діагностика · issue №123</a> · <a href="https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic/pulls/124/files">Виправлення · PR №124</a> · <a href="evidence/startup-crash.txt">Лог попередньої версії</a> · <a href="evidence/android-clean.png">Кадр чистої збірки</a></p>

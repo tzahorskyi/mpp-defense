@@ -8,21 +8,31 @@ import json
 import os
 from pathlib import Path
 import platform
-import re
-import secrets
 import shutil
 import socket
 import subprocess
 import tempfile
 import time
-from urllib.error import URLError
 from urllib.request import Request, urlopen
-from xml.etree import ElementTree as ET
 
 ROOT = "https://git.cvv-sandbox.eu.cc/Nazar/iot-diagnostic"
+REMOTE_API = "https://git.cvv-sandbox.eu.cc/iot-diagnostic/"
+SCENARIO = "https://tzahorskyi.github.io/mpp-defense/iot-android/"
 REV = "7198faf5999718bc87c5e4a0b99be4c6899aee0d"
 PACKAGE = "com.companyname.iot.mobile"
 CACHE = Path.home() / "Library/Caches/mpp-iot-defense"
+STEPS = (
+    ("android-connect", "Підключення до API", "В Android введи адресу й токен. Натисни «Підключити / оновити», обери свій демонстраційний пристрій."),
+    ("opening", "Вступ", "Покажи шапку, картку підключення та пристрої. Назви свою частину проєкту."),
+    ("architecture", "Код і редизайн", "У VS Code покажи IoT.Mobile.csproj, BindingContext, MainPage.xaml і команди ViewModel."),
+    ("devices", "Пристрої", "Покажи список. Для створення й редагування використай свій тестовий запис Demo CRUD."),
+    ("http", "HTTP-тест", "Обери GET, шлях simulator/normal, таймаут 5000. Натисни «Виконати тест» і покажи HTTP 200 та JSON."),
+    ("alerts", "Аномалія і графік", "Виконай simulator/out-of-range. Покажи температуру 150, попередження та пік на графіку."),
+    ("offline", "Офлайн", "Увімкни режим польоту, вимкни Wi-Fi. Збережи опис android-offline-demo та покажи одну зміну в черзі."),
+    ("sync", "Синхронізація", "Віднови Wi-Fi. Натисни «Синхронізувати» та покажи «надіслано 1, відхилено 0» і новий опис."),
+    ("git-proof", "Forgejo і мій внесок", "Покажи PR №112, №122 і №124, потім свій коментар та повторне рев’ю у №102."),
+    ("actions", "Тести, Actions і підсумок", "Покажи тест перерваної синхронізації, IoT validation №61 і SonarQube №62. Підсумуй показ."),
+)
 
 def run(*args, timeout=40):
     return subprocess.check_output(args, timeout=timeout, text=True).strip()
@@ -34,7 +44,7 @@ def wait_for(label, read, timeout):
             result = read()
             if result is not None and result is not False:
                 return result
-        except (subprocess.SubprocessError, URLError, ET.ParseError, ValueError):
+        except subprocess.SubprocessError:
             pass
         time.sleep(1)
     raise RuntimeError(f"Не вдалося дочекатися: {label}.")
@@ -70,92 +80,44 @@ def prepare_source(supplied):
         raise RuntimeError(f"У клоні є локальні правки. Для цього запуску потрібен чистий клон: {source}")
     return source
 
-def prepare_api(base):
-    def request(path, payload=None, method=None, token=None):
-        headers = {"Content-Type": "application/json"}
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        body = json.dumps(payload).encode() if payload is not None else None
-        with urlopen(Request(base + path, data=body, headers=headers, method=method), timeout=3) as response:
-            return json.load(response)
-
-    wait_for("API зі status: ok", lambda: request("/")["status"] == "ok", 35)
-    token = request("/api/auth/token", {"user": "defense", "role": "Admin", "group": "default"})["token"]
-    device = request("/api/devices", {
-        "name": "Demo sensor", "baseUrl": base, "description": "Before sync",
-        "monitoringEnabled": False, "monitoringPath": "simulator/normal",
-    }, token=token)
-    path = f"/api/devices/{device['id']}"
-    request(path + "/rules", [{"jsonPath": "temperature", "minimum": 0, "maximum": 40, "required": True}], "PUT", token)
-    for _ in range(2):
-        result = request(path + "/requests", {"method": "GET", "path": "simulator/normal", "timeoutMs": 1000}, token=token)
-        if result["statusCode"] != 200 or result["error"] is not None:
-            raise RuntimeError("Симулятор не повернув успішне вимірювання.")
-    return token
-
-def connect_android(adb, address, token):
-    def nodes():
-        dump_path = "/sdcard/mpp-iot-demo.xml"
-        result = adb("shell", "uiautomator", "dump", dump_path, timeout=9)
-        if not result.endswith(dump_path):
-            raise ValueError("Стан екрана Android ще не оновлено.")
-        return list(ET.fromstring(adb("shell", "cat", dump_path)).iter("node"))
-
-    def labels(name):
-        return next((n for n in nodes() if n.get("text", "").strip() == name), None)
-
-    def tap(node):
-        x0, y0, x1, y1 = map(int, re.findall(r"\d+", node.get("bounds", "")))
-        adb("shell", "input", "tap", str((x0 + x1) // 2), str((y0 + y1) // 2))
-
-    def focus_and_clear(node):
-        tap(node)
-        time.sleep(0.9)
-        adb("shell", "input", "keycombination", "113", "29")
-        adb("shell", "input", "keyevent", "67")
-
-    def token_entry():
-        return next((n for n in nodes() if n.get("password") == "true"), None)
-
-    def address_entry():
-        screen = nodes()
-        prompt = next((n for n in screen if n.get("text") == "Wait"), None)
-        if prompt is not None:
-            tap(prompt)
-            return None
-        return next((n for n in screen
-                     if n.get("class") == "android.widget.EditText" and n.get("password") != "true"), None)
-
-    entry = wait_for("поля адреси в Android", address_entry, 90)
-    if entry.get("text") != address:
-        focus_and_clear(entry)
-        adb("shell", "input", "text", address)
-        adb("shell", "input", "keyevent", "4")
-        wait_for("оновленої адреси API", lambda: labels(address), 15)
-    if not re.fullmatch(r"[A-Za-z0-9_.-]+", token):
-        raise RuntimeError("API повернув токен у несподіваному форматі.")
+def check_remote_api():
+    request = Request(REMOTE_API, headers={"User-Agent": "IoTDiagnostics/1.0"})
     try:
-        length = -1
-        for chunk_size in (32, 12):
-            secret_field = wait_for("поля токена", token_entry, 25)
-            focus_and_clear(secret_field)
-            for offset in range(0, len(token), chunk_size):
-                adb("shell", "input", "text", token[offset:offset + chunk_size])
-            visible = wait_for("стану поля токена", token_entry, 25)
-            length = len(visible.get("text", ""))
-            if length == len(token):
+        with urlopen(request, timeout=5) as response:
+            health = json.load(response)
+        if isinstance(health, dict) and health.get("name") == "IoT Diagnostics API" and health.get("status") == "ok":
+            print(f"Спільний API відповідає: {REMOTE_API}")
+            return
+    except (OSError, ValueError):
+        pass
+    print(f"Перевір доступ до спільного API: {REMOTE_API}")
+
+def show_guide(terminal):
+    index = 0
+    while index < len(STEPS):
+        anchor, title, cue = STEPS[index]
+        section = f"{SCENARIO}#{anchor}"
+        print(f"\nКрок {index + 1:02}/{len(STEPS):02} · {title}\n{cue}\n{section}")
+        if anchor == "android-connect":
+            print(f"Адреса сервера в Android · {REMOTE_API}")
+            print("Встав виданий командою токен у «Токен доступу» до поширення екрана.")
+        while True:
+            print("Enter · далі | o · відкрити розділ | b · назад | q · завершити підказки > ", end="", flush=True)
+            answer = terminal.readline()
+            if not answer or answer.strip().lower() == "q":
+                return
+            command = answer.strip().lower()
+            if command == "":
+                index += 1
                 break
-            print(f"Повторю ввід токена: Android прийняв {length} із {len(token)} символів.")
-        else:
-            raise RuntimeError(f"Поле токена прийняло {length} із {len(token)} символів.")
-        adb("shell", "input", "keyevent", "4")
-    except subprocess.SubprocessError:
-        raise RuntimeError("Android не прийняв тестовий токен.") from None
-    tap(wait_for("кнопки підключення", lambda: labels("Підключити / оновити"), 20))
-    wait_for("повідомлення «Завантажено пристроїв: 1»", lambda: labels("Завантажено пристроїв: 1"), 30)
-    tap(wait_for("списку пристроїв", lambda: labels("Оберіть пристрій"), 20))
-    tap(wait_for("пристрою Demo sensor", lambda: labels("Demo sensor"), 20))
-    wait_for("картки Demo sensor", lambda: sum(n.get("text") == "Demo sensor" for n in nodes()) >= 2, 20)
+            if command == "b" and index > 0:
+                index -= 1
+                break
+            if command == "o":
+                subprocess.run(["open", section], check=False)
+            else:
+                print("Натисни Enter або введи одну з команд вище.")
+    print("Усі кроки показу завершено.")
 
 def open_materials(source):
     editor = Path("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code")
@@ -171,7 +133,7 @@ def open_materials(source):
     subprocess.run(["open",
                     ROOT + "/pulls/122", ROOT + "/pulls/112", ROOT + "/pulls/124",
                     ROOT + "/pulls/102#issuecomment-1698", ROOT + "/actions/runs/61",
-                    ROOT + "/actions/runs/62", "https://tzahorskyi.github.io/mpp-defense/iot-android/#prep"], check=False)
+                    ROOT + "/actions/runs/62", SCENARIO + "#android-connect"], check=False)
 
 def isolate_avd(scope):
     avd_home = Path(os.environ.get("ANDROID_AVD_HOME") or
@@ -197,10 +159,23 @@ def isolate_avd(scope):
     return dict(os.environ, ANDROID_AVD_HOME=str(isolated_home))
 
 def main():
-    parser = argparse.ArgumentParser(prog="demo-iot.sh", description="Запустити API, Android та матеріали до захисту IoT Diagnostic Platform.")
+    parser = argparse.ArgumentParser(prog="demo-iot.sh", description="Запустити Android і вести показ зі спільним API IoT Diagnostic Platform.")
     parser.add_argument("--source", type=Path, help=f"Використати наявний чистий клон {REV[:7]}.")
-    parser.add_argument("--no-tabs", action="store_true", help="Запустити API й Android без браузера та VS Code.")
+    parser.add_argument("--no-tabs", action="store_true", help="Запустити Android без браузера та VS Code.")
+    parser.add_argument("--guide", action="store_true", help="Відкрити лише покрокові підказки для вже запущеного проєкту.")
     args = parser.parse_args()
+    try:
+        terminal = open("/dev/tty", encoding="utf-8")
+    except OSError:
+        raise RuntimeError("Відкрий скрипт в інтерактивному терміналі для керування через Enter.") from None
+    with terminal:
+        check_remote_api()
+        if args.guide:
+            show_guide(terminal)
+        else:
+            launch_demo(args, terminal)
+
+def launch_demo(args, terminal):
     sdk = Path(os.getenv("ANDROID_SDK_ROOT") or os.getenv("ANDROID_HOME") or Path.home() / "Library/Android/sdk")
     emulator = sdk / "emulator/emulator"
     platform_adb = sdk / "platform-tools/adb"
@@ -219,19 +194,16 @@ def main():
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            raise RuntimeError("Демо вже запущено. Для повтору натисни Ctrl+C у його терміналі.") from None
+            raise RuntimeError("Демо вже запущено. Для підказок у новому терміналі виконай ./demo-iot.sh --guide.") from None
         logs = Path(tempfile.mkdtemp(prefix="run-", dir=CACHE))
         print(f"Журнали запуску: {logs}")
         source = prepare_source(args.source)
         android_rid = {"arm64": "android-arm64", "x86_64": "android-x64"}.get(platform.machine())
         if android_rid is None:
             raise RuntimeError("Не вдалося визначити архітектуру Android для цього Mac.")
-        port = next((p for p in [5000, *range(15580, 15600)] if free(p)), None)
         emu_port = next((p for p in range(5580, 5600, 2) if free(p) and free(p + 1)), None)
-        if port is None or emu_port is None:
-            raise RuntimeError("Немає вільного локального порту для API або емулятора.")
-        base = f"http://127.0.0.1:{port}"
-        address = f"http://10.0.2.2:{port}"
+        if emu_port is None:
+            raise RuntimeError("Немає вільного локального порту для емулятора.")
         serial = f"emulator-{emu_port}"
         print(f"Запускаю mpp_phone ({serial}).")
         emu_log = scope.enter_context((logs / "emulator.log").open("w"))
@@ -246,46 +218,31 @@ def main():
             return run(str(platform_adb), "-s", serial, *command, timeout=timeout)
 
         build_log = scope.enter_context((logs / "build.log").open("w"))
-        print(f"Збираю API та Android із {REV[:7]}. Перша Android-збірка може тривати кілька хвилин.")
+        print(f"Збираю Android із {REV[:7]}. Перша збірка може тривати кілька хвилин.")
         try:
-            subprocess.run(["dotnet", "build", "src/IoT.Api", "--nologo"],
-                           cwd=source, stdout=build_log, stderr=subprocess.STDOUT, check=True, timeout=480)
             subprocess.run(["dotnet", "build", "src/IoT.Mobile", "--nologo", "-f", "net10.0-android",
                             "-r", android_rid, "-p:EmbedAssembliesIntoApk=true", f"-p:JavaSdkDirectory={java}", f"-p:AndroidSdkDirectory={sdk}"],
                            cwd=source, stdout=build_log, stderr=subprocess.STDOUT, check=True, timeout=720)
         except subprocess.SubprocessError:
             raise RuntimeError(f"Помилка або таймаут збірки. Відкрий {logs / 'build.log'}. Якщо бракує MAUI, виконай dotnet workload restore src/IoT.Mobile/IoT.Mobile.csproj у клоні.") from None
 
-        env = dict(os.environ, ASPNETCORE_ENVIRONMENT="Development",
-                   Auth__AllowDevTokens="true", Auth__SigningKey=secrets.token_hex(32),
-                   ConnectionStrings__Default=f"Data Source={logs / 'demo.db'}")
-        api_log = scope.enter_context((logs / "api.log").open("w"))
-        api_process = subprocess.Popen(
-            ["dotnet", "src/IoT.Api/bin/Debug/net10.0/IoT.Api.dll", "--urls", base],
-            cwd=source, env=env, stdout=api_log, stderr=subprocess.STDOUT, start_new_session=True)
-        scope.callback(stop, api_process)
-        token = prepare_api(base)
-        print(f"API готовий на {base}. Створено Demo sensor, правило 0–40 і два вимірювання.")
         wait_for(f"завантаження {serial}", lambda: adb("shell", "getprop", "sys.boot_completed") == "1", 180)
         adb("shell", "cmd", "connectivity", "airplane-mode", "disable")
         adb("shell", "svc", "wifi", "enable")
         apk = source / "src/IoT.Mobile/bin/Debug/net10.0-android" / android_rid / f"{PACKAGE}-Signed.apk"
-        print("Встановлюю APK та підключаю Android до API.")
-        installed = False
+        print("Встановлюю APK та відкриваю IoT Diagnostics.")
         try:
             # Install from a local file so package extraction does not depend on an ADB stream.
             guest_apk = "/data/local/tmp/mpp-iot-defense.apk"
             adb("push", str(apk), guest_apk, timeout=90)
             if adb("shell", "pm", "install", "-r", guest_apk, timeout=120) != "Success":
                 raise RuntimeError("Android не встановив APK.")
-            installed = True
             activities = adb("shell", "cmd", "package", "resolve-activity", "--brief", PACKAGE).splitlines()
             component = next((line for line in activities if line.startswith(PACKAGE + "/")), None)
             if component is None:
                 raise RuntimeError("Android не знайшов головний екран IoT Diagnostics.")
             wait_for("запуску IoT Diagnostics", lambda: "Starting:" in adb("shell", "am", "start", "-n", component, timeout=10), 55)
-            connect_android(adb, address, token)
-            print(f"Готово. Android {address} · Demo sensor вибрано.")
+            print("IoT Diagnostics відкрито. Далі керуй показом у терміналі.")
         except (RuntimeError, subprocess.SubprocessError) as error:
             try:
                 (logs / "android-crash.log").write_text(adb("logcat", "-d", "-b", "crash", timeout=10))
@@ -293,17 +250,12 @@ def main():
                 pass
             detail = str(error) if isinstance(error, RuntimeError) else "ADB не завершив операцію."
             print(f"Підготовка Android не завершилася. {detail}")
-            if installed:
-                print(f"Для ручного підключення введи {address}. Створи свіжий токен за інструкцією E3.")
-            else:
-                print(f"API працює на {base}. Діагностика Android: {logs}.")
+            print(f"В Android відкрий IoT Diagnostics. Діагностика: {logs}.")
         if not args.no_tabs:
             open_materials(source)
-        print("Залиш термінал відкритим на час показу. Ctrl+C зупиняє це демо.")
-        while emulator_process.poll() is None:
-            if api_process.poll() is not None:
-                raise RuntimeError(f"API завершив роботу. Відкрий {logs / 'api.log'}.")
-            time.sleep(1)
+        show_guide(terminal)
+        print("Емулятор залишається відкритим. Ctrl+C зупиняє цей емулятор.")
+        emulator_process.wait()
 
 try:
     main()
