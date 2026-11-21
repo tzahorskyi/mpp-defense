@@ -109,11 +109,14 @@ def connect_android(adb, address, token):
 
     def set_text(node, value):
         tap(node)
-        time.sleep(0.6)
+        time.sleep(0.9)
         adb("shell", "input", "keycombination", "113", "29")
         adb("shell", "input", "keyevent", "67")
-        adb("shell", "input", "text", value)
-        adb("shell", "input", "keyevent", "4")
+        for offset in range(0, len(value), 36):
+            adb("shell", "input", "text", value[offset:offset + 36])
+
+    def token_entry():
+        return next((n for n in nodes() if n.get("password") == "true"), None)
 
     def address_entry():
         screen = nodes()
@@ -127,12 +130,18 @@ def connect_android(adb, address, token):
     entry = wait_for("поля адреси в Android", address_entry, 60)
     if entry.get("text") != address:
         set_text(entry, address)
+        adb("shell", "input", "keyevent", "4")
         wait_for("оновленої адреси API", lambda: labels(address), 15)
-    secret_field = wait_for("поля токена", lambda: next((n for n in nodes() if n.get("password") == "true"), None), 15)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", token):
         raise RuntimeError("API повернув токен у несподіваному форматі.")
     try:
+        secret_field = wait_for("поля токена", token_entry, 15)
         set_text(secret_field, token)
+        def has_full_token():
+            field = token_entry()
+            return field is not None and len(field.get("text", "")) == len(token)
+        wait_for("повного токена в полі Android", has_full_token, 20)
+        adb("shell", "input", "keyevent", "4")
     except subprocess.SubprocessError:
         raise RuntimeError("Android не прийняв тестовий токен.") from None
     tap(wait_for("кнопки підключення", lambda: labels("Підключити / оновити"), 20))
@@ -194,7 +203,7 @@ def main():
         print(f"Запускаю mpp_phone ({serial}).")
         emu_log = scope.enter_context((logs / "emulator.log").open("w"))
         emulator_process = subprocess.Popen(
-            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-read-only", "-no-snapshot", "-no-audio"],
+            [str(emulator), "-avd", "mpp_phone", "-port", str(emu_port), "-memory", "3072", "-read-only", "-no-snapshot", "-no-audio"],
             stdout=emu_log, stderr=subprocess.STDOUT, start_new_session=True)
         scope.callback(stop, emulator_process)
 
